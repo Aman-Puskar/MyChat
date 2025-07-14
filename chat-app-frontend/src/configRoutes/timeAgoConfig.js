@@ -1,6 +1,7 @@
 export function getTimeAgo(timestamp) {
+  // Convert UTC timestamp to local time
+  const past = new Date(new Date(timestamp).toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
   const now = new Date();
-  const past = new Date(timestamp); // this is automatically in local time
 
   const secondsAgo = Math.floor((now - past) / 1000);
 
