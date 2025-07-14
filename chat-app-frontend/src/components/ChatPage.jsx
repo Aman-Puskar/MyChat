@@ -252,7 +252,7 @@ const ChatPage = () => {
                      typingTimeoutRef.current = setTimeout(() => {
                      stompClient.send(`/app/stopTyping/${roomId}`, {}, JSON.stringify({ sender: currentUser }));
                      setIsTyping(false);
-                        }, 1000);
+                        }, 3000);
                     }}
                  type="text"
                  placeholder='Your message...'
