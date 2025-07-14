@@ -97,7 +97,11 @@ const ChatPage = () => {
         reconnectDelay: 5000,
         debug: (str) => console.log('[STOMP]', str), 
         onConnect: () => {
-            setStompClient(client);
+             setStompClient({
+        send: (destination, headers, body) => {
+            client.publish({ destination, headers, body });
+        }
+    });
             toast.success("Connected to STOMP");
 
             // Subscribe to room messages
@@ -143,25 +147,21 @@ const ChatPage = () => {
     };
 }, [roomId, connected]);
 
-  const sendMessage = () => {
-    if (!stompClient || typeof stompClient.send !== 'function') {
-        toast.error("WebSocket not connected.");
-        console.warn("stompClient:", stompClient); // Debug log
-        return;
+    //handling input messages
+    const sendMessage = () => {
+        if(stompClient && connected && input.trim()) {
+            // console.log(input);
+            
+        }
+        const encryptedContent = encryptMessage(input);
+        const message = {
+            content : encryptedContent,
+            sender : currentUser,
+            roomId : roomId
+        }
+        stompClient.send(`/app/sendMessage/${roomId}`, {}, JSON.stringify(message));
+        setInput("");
     }
-
-    if (!input.trim()) return;
-
-    const encryptedContent = encryptMessage(input);
-    const message = {
-        content : encryptedContent,
-        sender : currentUser,
-        roomId : roomId
-    };
-
-    stompClient.send(`/app/sendMessage/${roomId}`, {}, JSON.stringify(message));
-    setInput("");
-};
 
     //handle logout
     function handleLogOut() {
