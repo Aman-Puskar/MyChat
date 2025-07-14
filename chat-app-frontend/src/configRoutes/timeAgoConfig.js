@@ -1,9 +1,11 @@
 export function getTimeAgo(timestamp) {
-  // Convert UTC timestamp to local time
-  const past = new Date(new Date(timestamp).toLocaleString("en-US", { timeZone: "Asia/Kolkata" }));
+  const utcDate = new Date(timestamp);
+
+  // Convert UTC to local timezone
+  const localDate = new Date(utcDate.getTime() + (new Date().getTimezoneOffset() * -60000));
   const now = new Date();
 
-  const secondsAgo = Math.floor((now - past) / 1000);
+  const secondsAgo = Math.floor((now - localDate) / 1000);
 
   if (secondsAgo < 60) return `${secondsAgo} seconds ago`;
   const minutesAgo = Math.floor(secondsAgo / 60);
