@@ -206,7 +206,7 @@ const ChatPage = () => {
            <div key={index} className={`flex ${message.sender === currentUser ? "justify-end" : "justify-start"} mt-2`}>
              <div className={`'mt-3  rounded text-gray-900 ${message.sender === currentUser ? "bg-gray-100" : "bg-green-200"}`} >
                 <div className='flex flex-row gap-2'>
-                    <img className='h-10 w-10 p-1 ' src={`${message.sender === currentUser ? "https://avatar.iran.liara.run/public" : "https://avatar.iran.liara.run/public"}`} alt="" />
+                    <img className='h-10 w-10 p-1 ' src={`https://ui-avatars.com/api/?name=${message.sender}&background=random`} alt="" />
                     <div className='flex flex-col gap-2 px-1'>
                     <p className='font-bold text-sm'>{message.sender}</p>
                     <p>{message.content}</p>
