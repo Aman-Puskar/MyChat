@@ -9,6 +9,7 @@ import toast from 'react-hot-toast'
 import {getRoomMessages}  from '../services/RoomService';
 import { getTimeAgo } from '../configRoutes/timeAgoConfig';
 import CryptoJS from 'crypto-js';
+import { Client } from '@stomp/stompjs';
 
 const ChatPage = () => {
 
@@ -89,42 +90,58 @@ const ChatPage = () => {
 
     //stomp client initialization and subscription
     useEffect(() => {
-        const webSocketConnection = () => {
-            //sockjs
-            const socket = new SockJS(`${baseURL}/chat`);
-            const client = Stomp.over(socket);
+    if (!connected) return;
 
-            client.connect({}, () =>{
-                setStompClient(client);
-                toast.success("Connected to Stomp");
-                client.subscribe(`/topic/room/${roomId}`, (message) => {
+    const client = new Client({
+        webSocketFactory: () => new SockJS(`${baseURL}/chat`),
+        reconnectDelay: 5000,
+        debug: (str) => console.log('[STOMP]', str), 
+        onConnect: () => {
+            setStompClient(client);
+            toast.success("Connected to STOMP");
 
-                    // console.log(message);
-                    const newMessage = JSON.parse(message.body);
-                    newMessage.content = decryptMessage(newMessage.content);
-                    setMessages((prev) => [...prev, newMessage]);
-                    
-                })
-                client.subscribe(`/topic/typing/${roomId}`, (message) => {
+            // Subscribe to room messages
+            client.subscribe(`/topic/room/${roomId}`, (message) => {
+                const newMessage = JSON.parse(message.body);
+                newMessage.content = decryptMessage(newMessage.content);
+                setMessages((prev) => [...prev, newMessage]);
+            });
+
+            // Typing indicator
+            client.subscribe(`/topic/typing/${roomId}`, (message) => {
                 const { sender } = JSON.parse(message.body);
                 if (sender !== currentUser) {
-                setTypingUser(sender);
-                 }
-                });
+                    setTypingUser(sender);
+                }
+            });
 
-                client.subscribe(`/topic/stopTyping/${roomId}`, (message) => {
+            client.subscribe(`/topic/stopTyping/${roomId}`, (message) => {
                 const { sender } = JSON.parse(message.body);
                 if (sender !== currentUser) {
-                setTypingUser(null);
-                    }
-                });
-            })
-        };
+                    setTypingUser(null);
+                }
+            });
+        },
+        onStompError: (frame) => {
+            console.error("STOMP Error:", frame.headers['message']);
+            console.error("Details:", frame.body);
+            toast.error("STOMP connection error");
+        },
+        onWebSocketError: (event) => {
+            console.error("WebSocket Error:", event);
+            toast.error("WebSocket connection failed");
+        },
+    });
 
-        if(connected) {
-        webSocketConnection();
+    client.activate(); // Start the connection
+
+    return () => {
+        // Cleanup on unmount or roomId change
+        if (client.connected) {
+            client.deactivate();
         }
-    }, [roomId]);
+    };
+}, [roomId, connected]);
 
     //handling input messages
     const sendMessage = () => {
