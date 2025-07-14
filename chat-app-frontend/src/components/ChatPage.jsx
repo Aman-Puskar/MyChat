@@ -99,7 +99,7 @@ const ChatPage = () => {
                 toast.success("Connected to Stomp");
                 client.subscribe(`/topic/room/${roomId}`, (message) => {
 
-                    console.log(message);
+                    // console.log(message);
                     const newMessage = JSON.parse(message.body);
                     newMessage.content = decryptMessage(newMessage.content);
                     setMessages((prev) => [...prev, newMessage]);
@@ -129,7 +129,7 @@ const ChatPage = () => {
     //handling input messages
     const sendMessage = () => {
         if(stompClient && connected && input.trim()) {
-            console.log(input);
+            // console.log(input);
             
         }
         const encryptedContent = encryptMessage(input);
