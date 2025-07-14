@@ -1,7 +1,8 @@
 export function getTimeAgo(timestamp) {
   const now = new Date();
-  const past = new Date(timestamp);
-  const secondsAgo = Math.floor((now - past) / 1000);
+  const past = new Date(timestamp); // this handles ISO string
+
+  const secondsAgo = Math.floor((now.getTime() - past.getTime()) / 1000);
 
   if (secondsAgo < 60) return `${secondsAgo} seconds ago`;
   const minutesAgo = Math.floor(secondsAgo / 60);
