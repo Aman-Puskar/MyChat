@@ -143,21 +143,25 @@ const ChatPage = () => {
     };
 }, [roomId, connected]);
 
-    //handling input messages
-    const sendMessage = () => {
-        if(stompClient && connected && input.trim()) {
-            // console.log(input);
-            
-        }
-        const encryptedContent = encryptMessage(input);
-        const message = {
-            content : encryptedContent,
-            sender : currentUser,
-            roomId : roomId
-        }
-        stompClient.send(`/app/sendMessage/${roomId}`, {}, JSON.stringify(message));
-        setInput("");
+  const sendMessage = () => {
+    if (!stompClient || typeof stompClient.send !== 'function') {
+        toast.error("WebSocket not connected.");
+        console.warn("stompClient:", stompClient); // Debug log
+        return;
     }
+
+    if (!input.trim()) return;
+
+    const encryptedContent = encryptMessage(input);
+    const message = {
+        content : encryptedContent,
+        sender : currentUser,
+        roomId : roomId
+    };
+
+    stompClient.send(`/app/sendMessage/${roomId}`, {}, JSON.stringify(message));
+    setInput("");
+};
 
     //handle logout
     function handleLogOut() {
