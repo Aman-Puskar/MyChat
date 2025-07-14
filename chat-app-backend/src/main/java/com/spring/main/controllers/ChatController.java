@@ -1,9 +1,12 @@
 package com.spring.main.controllers;
 
 import java.time.LocalDateTime;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -42,5 +45,27 @@ public class ChatController {
             throw new RuntimeException("room not found !!");
         }
         return message;
+    }
+
+    // handling the typing indication
+
+    // when typing
+    @MessageMapping("/typing/{roomId}")
+    @SendTo("/topic/typing/{roomId}")
+    public Map<String, String> handleTyping(
+            @DestinationVariable String roomId,
+            @Payload Map<String, String> payload) {
+        // payload = { "sender": "Aman" }
+        return payload;
+    }
+
+    // when stop typing
+    @MessageMapping("/stopTyping/{roomId}")
+    @SendTo("/topic/stopTyping/{roomId}")
+    public Map<String, String> handleStopTyping(
+            @DestinationVariable String roomId,
+            @Payload Map<String, String> payload) {
+        // payload = { "sender": "Aman" }
+        return payload;
     }
 }

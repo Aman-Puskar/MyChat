@@ -13,6 +13,12 @@ import CryptoJS from 'crypto-js';
 const ChatPage = () => {
 
 
+    //typing indication
+    const [isTyping, setIsTyping] = useState(false); // you are typing
+    const [typingUser, setTypingUser] = useState(null); // who else is typing
+    const typingTimeoutRef = useRef(null);
+
+
     const navigate = useNavigate();
     const{roomId, currentUser, connected,setRoomId, setCurrentUser, setConnected} = useChatContext();
     // console.log(currentUser);
@@ -81,11 +87,6 @@ const ChatPage = () => {
 
 
 
-
-
-
-
-
     //stomp client initialization and subscription
     useEffect(() => {
         const webSocketConnection = () => {
@@ -104,6 +105,19 @@ const ChatPage = () => {
                     setMessages((prev) => [...prev, newMessage]);
                     
                 })
+                client.subscribe(`/topic/typing/${roomId}`, (message) => {
+                const { sender } = JSON.parse(message.body);
+                if (sender !== currentUser) {
+                setTypingUser(sender);
+                 }
+                });
+
+                client.subscribe(`/topic/stopTyping/${roomId}`, (message) => {
+                const { sender } = JSON.parse(message.body);
+                if (sender !== currentUser) {
+                setTypingUser(null);
+                    }
+                });
             })
         };
 
@@ -137,6 +151,9 @@ const ChatPage = () => {
         toast.success(` User ${currentUser} logout successfully !!`);
     }
 
+
+
+
   return (
     <div>
         <header className='border-gray-400 fixed w-full bg-gray-800 py-5 flex justify-around rounded shadow items-center'>
@@ -162,6 +179,7 @@ const ChatPage = () => {
 
 
     <main ref={chatBoxRef} className=' py-20 border w-2/3 mx-auto bg-gray-500 h-screen overflow-y-auto px-7 flex flex-col'>
+    
        {
         messages.map((message, index) => (
            <div key={index} className={`flex ${message.sender === currentUser ? "justify-end" : "justify-start"} mt-2`}>
@@ -176,20 +194,45 @@ const ChatPage = () => {
                 </div>
             </div>
            </div>
+           
         ))}
+         {typingUser && (
+            <div className="mt-2 text-lg italic text-gray-100">
+            {typingUser} is typing...
+            </div>
+             )}
+         
     </main>
 
 
         <div className='fixed bottom-2  w-full h-17'>
             <div className='h-full pr-3 gap-3 flex justify-between items-center bg-gray-800 rounded-full  mx-auto w-2/3'>
                 <input
-                onKeyDown={(e) => {
+                    onKeyDown={(e) => {
                     if(e.key == "Enter") {
                         sendMessage();
                     }
                 }}  
                  value={input}
-                 onChange={(e) => {setInput(e.target.value)}}
+                onChange={(e) => {
+                    setInput(e.target.value);
+
+                    if (!stompClient) return;
+
+                    if (!isTyping) {
+                      stompClient.send(`/app/typing/${roomId}`, {}, JSON.stringify({ sender: currentUser }));
+                      setIsTyping(true);
+                    }
+
+                    if (typingTimeoutRef.current) {
+                    clearTimeout(typingTimeoutRef.current);
+                    }
+
+                     typingTimeoutRef.current = setTimeout(() => {
+                     stompClient.send(`/app/stopTyping/${roomId}`, {}, JSON.stringify({ sender: currentUser }));
+                     setIsTyping(false);
+                        }, 1000);
+                    }}
                  type="text"
                  placeholder='Your message...'
                  className='h-full px-2 py-2 rounded-full w-full bg-gray-700 text-gray-200 focus:outline-none'
