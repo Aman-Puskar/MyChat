@@ -18,7 +18,7 @@ import com.spring.main.playload.Messagerequest;
 import com.spring.main.repositories.RoomRepository;
 
 @Controller
-@CrossOrigin("http://localhost:5173")
+@CrossOrigin("https://mychat-theta-seven.vercel.app/")
 
 public class ChatController {
 

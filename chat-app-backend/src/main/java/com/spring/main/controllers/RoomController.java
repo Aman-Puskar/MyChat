@@ -20,7 +20,7 @@ import com.spring.main.repositories.RoomRepository;
 
 @RestController
 @RequestMapping("/api/v1/rooms")
-@CrossOrigin("http://localhost:5173")
+@CrossOrigin("https://mychat-theta-seven.vercel.app/")
 public class RoomController {
 
     @Autowired
