@@ -24,6 +24,11 @@ public class RoomController {
     @Autowired
     private RoomRepository roomRepository;
 
+    @GetMapping("/ping")
+    public String ping() {
+        return "pong";
+    }
+
     // create room
     @PostMapping
     public ResponseEntity<?> createRoom(@RequestBody String roomId) {
