@@ -258,8 +258,26 @@ const ChatPage = () => {
                  placeholder='Your message...'
                  className='h-full px-2 py-2 rounded-full w-full bg-gray-700 text-gray-200 focus:outline-none'
                 />
+                {showEmojiPicker && (
+      <div className="absolute bottom-16 right-20 z-50">
+        <EmojiPicker
+          onEmojiClick={(emojiData) => setInput((prev) => prev + emojiData.emoji)}
+          theme="dark"
+        />
+      </div>
+    )}
+
+                
 
                <div className='flex gap-2'>
+
+                     <button
+        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+        className='bg-yellow-400 py-2 px-3 h-13 w-13 flex justify-center items-center rounded-full hover:bg-yellow-600 text-xl'
+      >
+        😊
+      </button>
+
                  <button className='bg-green-400 py-2 px-3 h-13 w-13 flex justify-center items-center rounded-full hover:bg-green-700'>
                     <MdAttachFile size={30}/>
                 </button>
