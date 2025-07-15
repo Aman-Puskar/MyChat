@@ -29,7 +29,7 @@ function decryptRoomId(cipher) {
     });
 
     //taking values from ChatContext from useChatContext;
-    const{roomId, currentUser, connected, setRoomId, setCurrentUser, setConnected} = useChatContext();
+    const{roomId, actualRoom, currentUser, connected, setRoomId, setCurrentUser, setConnected, setActualRoom} = useChatContext();
 
 //handing input details
     function handleFormInputChange(event) {
@@ -52,6 +52,7 @@ function validation() {
       if(validation()) {
         //make them join the room chat
         try {
+          setActualRoom(details.roomId);
            const encryptedRoomId = encryptRoomId(details.roomId);
            const response = await joinRoomChatApi(encryptedRoomId);
             setRoomId(encryptedRoomId);
@@ -75,6 +76,7 @@ function validation() {
         //call api to create room from the backed
         try{
           //from roomservice
+            setActualRoom(details.roomId);
             const encryptedRoomId = encryptRoomId(details.roomId);
             const response = await createRoomApi(encryptedRoomId);            
             toast.success("Room created successfully !");

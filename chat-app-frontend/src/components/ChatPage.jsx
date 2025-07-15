@@ -26,7 +26,7 @@ const ChatPage = () => {
 
 
     const navigate = useNavigate();
-    const{roomId, currentUser, connected,setRoomId, setCurrentUser, setConnected} = useChatContext();
+    const{roomId,actualRoom, currentUser, connected,setRoomId, setCurrentUser, setConnected} = useChatContext();
     // console.log(currentUser);
     
     //use effect -> whenever something is changes it will redirect to the home page that is form page 
@@ -200,7 +200,7 @@ const ChatPage = () => {
         <header className='border-gray-400 fixed w-full bg-gray-800 py-5 flex justify-around rounded shadow items-center'>
             <div >
                 <h1>
-                    Room : <span>{roomId}</span>
+                    Room : <span>{actualRoom}</span>
                 </h1>
             </div>
 
