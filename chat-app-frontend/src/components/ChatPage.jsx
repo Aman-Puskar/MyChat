@@ -10,6 +10,8 @@ import {getRoomMessages}  from '../services/RoomService';
 import { getTimeAgo } from '../configRoutes/timeAgoConfig';
 import CryptoJS from 'crypto-js';
 import { Client } from '@stomp/stompjs';
+import EmojiPicker from 'emoji-picker-react';
+
 
 const ChatPage = () => {
 
@@ -18,6 +20,7 @@ const ChatPage = () => {
     const [isTyping, setIsTyping] = useState(false); // you are typing
     const [typingUser, setTypingUser] = useState(null); // who else is typing
     const typingTimeoutRef = useRef(null);
+    const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
 
     const navigate = useNavigate();
