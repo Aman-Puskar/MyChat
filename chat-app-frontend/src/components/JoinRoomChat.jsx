@@ -4,7 +4,20 @@ import toast from 'react-hot-toast';
 import { createRoom as createRoomApi, joinRoomChatApi } from '../services/RoomService';
 import useChatContext from '../context/ChatContext';
 import { useNavigate } from 'react-router';
+import CryptoJS from 'crypto-js';
+
 const JoinRoomChat = () => {
+
+const SECRET_KEY = "yourSuperSecretKey";
+
+function encryptRoomId(roomId) {
+  return CryptoJS.AES.encrypt(roomId, SECRET_KEY).toString();
+}
+
+function decryptRoomId(cipher) {
+  const bytes = CryptoJS.AES.decrypt(cipher, SECRET_KEY);
+  return bytes.toString(CryptoJS.enc.Utf8);
+}
 
     //navigator to chat page
     const navigate = useNavigate()
@@ -39,8 +52,9 @@ function validation() {
       if(validation()) {
         //make them join the room chat
         try {
-            const response = await joinRoomChatApi(details.roomId);
-            setRoomId(response.roomId);
+           const encryptedRoomId = encryptRoomId(details.roomId);
+           const response = await joinRoomChatApi(encryptedRoomId);
+            setRoomId(encryptedRoomId);
             setCurrentUser(details.userName); 
             setConnected(true);   
             toast.success("Room joined successfully !!");
@@ -61,10 +75,11 @@ function validation() {
         //call api to create room from the backed
         try{
           //from roomservice
-            const response = await createRoomApi(details.roomId);
+            const encryptedRoomId = encryptRoomId(details.roomId);
+            const response = await createRoomApi(encryptedRoomId);            
             toast.success("Room created successfully !");
             console.log(response);
-            setRoomId(response.roomId);
+            setRoomId(encryptedRoomId);
             setCurrentUser(details.userName); 
             setConnected(true);           
 
