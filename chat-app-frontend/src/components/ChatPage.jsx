@@ -63,6 +63,7 @@ const ChatPage = () => {
                      const decryptedMessages = message.map((msg) => ({
                         ...msg,
                         content: decryptMessage(msg.content),
+                        sender : decryptMessage(msg.sender),
             }));
                 setMessages(decryptedMessages);
                 
@@ -113,6 +114,7 @@ const ChatPage = () => {
             client.subscribe(`/topic/room/${roomId}`, (message) => {
                 const newMessage = JSON.parse(message.body);
                 newMessage.content = decryptMessage(newMessage.content);
+                newMessage.sender = decryptMessage(newMessage.sender);
                 setMessages((prev) => [...prev, newMessage]);
             });
 
@@ -159,9 +161,10 @@ const ChatPage = () => {
             
         }
         const encryptedContent = encryptMessage(input);
+        const encryptedSender = encryptMessage(currentUser);
         const message = {
             content : encryptedContent,
-            sender : currentUser,
+            sender : encryptedSender,
             roomId : roomId
         }
         stompClient.send(`/app/sendMessage/${roomId}`, {}, JSON.stringify(message));
