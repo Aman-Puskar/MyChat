@@ -11,7 +11,7 @@ const JoinRoomChat = () => {
 const SECRET_KEY = "yourSuperSecretKey";
 
 function encryptRoomId(roomId) {
-  return CryptoJS.AES.encrypt(roomId, SECRET_KEY).toString();
+  return CryptoJS.SHA256(roomId).toString();
 }
 
 function decryptRoomId(cipher) {
