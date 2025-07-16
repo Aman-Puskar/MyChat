@@ -301,9 +301,7 @@ const ChatPage = () => {
         😊
       </button>
 
-      <button className='bg-green-400 p-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-green-700'>
-        <MdAttachFile size={20} />
-      </button>
+      
 
       <button
         onClick={sendMessage}
