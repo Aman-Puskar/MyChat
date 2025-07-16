@@ -244,74 +244,77 @@ const ChatPage = () => {
          
     </main>
 
+<div className='fixed bottom-2 w-full px-2'>
+  <div className='w-full md:w-2/3 mx-auto flex items-center gap-2 bg-gray-800 px-3 py-2 rounded-full'>
 
-        <div className='fixed bottom-2  w-full h-17'>
-            <div className='w-full md:w-2/3 mx-auto flex flex-wrap sm:flex-nowrap gap-2 items-center bg-gray-800 px-3 py-2 rounded-full'>
-                <input
-                    onKeyDown={(e) => {
-                    if(e.key == "Enter") {
-                        sendMessage();
-                    }
-                }}  
-                 value={input}
-                onChange={(e) => {
-                    setInput(e.target.value);
+    <input
+      type="text"
+      value={input}
+      onChange={(e) => {
+        setInput(e.target.value);
 
-                    if (!stompClient) return;
+        if (!stompClient) return;
 
-                    if (!isTyping) {
-                      stompClient.send(`/app/typing/${roomId}`, {}, JSON.stringify({ sender: currentUser }));
-                      setIsTyping(true);
-                    }
+        if (!isTyping) {
+          stompClient.send(`/app/typing/${roomId}`, {}, JSON.stringify({ sender: currentUser }));
+          setIsTyping(true);
+        }
 
-                    if (typingTimeoutRef.current) {
-                    clearTimeout(typingTimeoutRef.current);
-                    }
+        if (typingTimeoutRef.current) {
+          clearTimeout(typingTimeoutRef.current);
+        }
 
-                     typingTimeoutRef.current = setTimeout(() => {
-                     stompClient.send(`/app/stopTyping/${roomId}`, {}, JSON.stringify({ sender: currentUser }));
-                     setIsTyping(false);
-                        }, 3000);
-                    }}
-                 type="text"
-                 placeholder='Your message...'
-                 className='h-full px-2 py-2 rounded-full w-full bg-gray-700 text-gray-200 focus:outline-none'
-                />
-                {showEmojiPicker && (
-                    
-                     <div
-                     ref={emojiPickerRef}
-                      className="absolute bottom-16 right-20 z-50">
-                     <EmojiPicker
-                    onEmojiClick={(emojiData) => setInput((prev) => prev + emojiData.emoji)}
-                    theme="dark"
-                     />
-                    </div>
-                )}
+        typingTimeoutRef.current = setTimeout(() => {
+          stompClient.send(`/app/stopTyping/${roomId}`, {}, JSON.stringify({ sender: currentUser }));
+          setIsTyping(false);
+        }, 3000);
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          sendMessage();
+        }
+      }}
+      placeholder='Your message...'
+      className='flex-1 px-3 py-2 rounded-full bg-gray-700 text-gray-200 text-sm focus:outline-none'
+    />
 
-                
+    {/* Emoji Picker */}
+    {showEmojiPicker && (
+      <div
+        ref={emojiPickerRef}
+        className="absolute bottom-20 right-10 z-50"
+      >
+        <EmojiPicker
+          onEmojiClick={(emojiData) => setInput((prev) => prev + emojiData.emoji)}
+          theme="dark"
+        />
+      </div>
+    )}
 
-                <div className='flex gap-2'>
+    {/* Action Buttons */}
+    <div className='flex items-center gap-2'>
 
-                     <button
-                         onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-                         className='bg-yellow-300 py-2 px-3 h-13 w-13 flex justify-center items-center rounded-full hover:bg-yellow-600 text-xl'
-                        >
-                         😊
-                        </button>
+      <button
+        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+        className='bg-yellow-300 p-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-yellow-600 text-lg md:text-xl'
+      >
+        😊
+      </button>
 
-                 <button className='bg-green-400 py-2 px-3 h-13 w-13 flex justify-center items-center rounded-full hover:bg-green-700'>
-                    <MdAttachFile size={30}/>
-                </button>
+      <button className='bg-green-400 p-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-green-700'>
+        <MdAttachFile size={20} />
+      </button>
 
-                <button 
-                 onClick={sendMessage}
-                 className='bg-blue-400 py-2 px-3 h-13 w-13 flex justify-center items-center rounded-full  hover:bg-blue-700'>
-                    <MdSend size={30}/>
-                </button>
-               </div>
-            </div>
-        </div>
+      <button
+        onClick={sendMessage}
+        className='bg-blue-400 p-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-blue-700'
+      >
+        <MdSend size={20} />
+      </button>
+    </div>
+  </div>
+</div>
+
     </div>
   )
 }
