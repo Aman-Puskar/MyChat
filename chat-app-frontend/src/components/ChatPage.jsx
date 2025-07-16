@@ -219,8 +219,7 @@ const ChatPage = () => {
 
 
 
-    <main ref={chatBoxRef} className=' py-20 border w-2/3 mx-auto bg-gray-500 h-screen overflow-y-auto px-7 flex flex-col'>
-    
+    <main ref={chatBoxRef} className='py-20 border w-full md:w-2/3 mx-auto bg-gray-500 h-[calc(100vh-100px)] overflow-y-auto px-3 md:px-7 flex flex-col'>
        {
         messages.map((message, index) => (
            <div key={index} className={`flex ${message.sender === currentUser ? "justify-end" : "justify-start"} mt-2`}>
@@ -247,7 +246,7 @@ const ChatPage = () => {
 
 
         <div className='fixed bottom-2  w-full h-17'>
-            <div className='h-full pr-3 gap-3 flex justify-between items-center bg-gray-800 rounded-full  mx-auto w-2/3'>
+            <div className='w-full md:w-2/3 mx-auto flex flex-wrap sm:flex-nowrap gap-2 items-center bg-gray-800 px-3 py-2 rounded-full'>
                 <input
                     onKeyDown={(e) => {
                     if(e.key == "Enter") {
