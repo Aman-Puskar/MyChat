@@ -66,4 +66,21 @@ public class ChatController {
         // payload = { "sender": "Aman" }
         return payload;
     }
+
+    // online status
+    @MessageMapping("/isOnline/{roomId}")
+    @SendTo("/topic/isOnline/{roomId}")
+    public Map<String, String> handleOnlineStatus(
+            @DestinationVariable String roomId,
+            @Payload Map<String, String> payload) {
+        return payload;
+    }
+
+    @MessageMapping("/isOffline/{roomId}")
+    @SendTo("/topic/isOffline/{roomId}")
+    public Map<String, String> handleOfflineStatus(
+            @DestinationVariable String roomId,
+            @Payload Map<String, String> payload) {
+        return payload;
+    }
 }

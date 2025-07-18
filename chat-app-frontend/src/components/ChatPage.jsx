@@ -14,7 +14,9 @@ import EmojiPicker from 'emoji-picker-react';
 
 
 const ChatPage = () => {
-
+  //show online status
+  const[isOnline, setIsOnline] = useState(false);
+  const[onlineUser, setOnlineUser] = useState(null);
 
     //typing indication
     const [isTyping, setIsTyping] = useState(false); // you are typing
@@ -38,7 +40,6 @@ const ChatPage = () => {
     
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
-    const inputRef = useRef(null);
     const chatBoxRef = useRef(null);
     const [stompClient, setStompClient] = useState(null);
 
@@ -132,6 +133,20 @@ const ChatPage = () => {
                     setTypingUser(null);
                 }
             });
+
+            //isonline status
+            client.subscribe(`/topic/isOnline/${roomId}`, (message) => {
+                const { sender } = JSON.parse(message.body);
+                if (sender !== currentUser) {
+                    setOnlineUser(sender);
+                }
+            });
+             client.subscribe(`/topic/isOffline/${roomId}`, (message) => {
+                const { sender } = JSON.parse(message.body);
+                if (sender !== currentUser) {
+                    setOnlineUser(null);
+                }
+            });
         },
         onStompError: (frame) => {
             console.error("STOMP Error:", frame.headers['message']);
@@ -179,7 +194,7 @@ const ChatPage = () => {
         navigate("/")
         toast.success(` User ${currentUser} logout successfully !!`);
     }
-
+//emoji picker
     useEffect(() => {
   function handleClickOutside(event) {
     if (emojiPickerRef.current && !emojiPickerRef.current.contains(event.target)) {
@@ -193,6 +208,18 @@ const ChatPage = () => {
   };
 }, []);
 
+//online status
+useEffect(() => {
+  if(connected && stompClient) {
+      stompClient.send(`/app/isOnline/${roomId}`, {}, JSON.stringify({ sender: currentUser }));
+          setIsOnline(true);
+  }
+  else {
+    stompClient.send(`/app/isOffline/${roomId}`, {}, JSON.stringify({ sender: currentUser }));
+          setIsOnline(false);
+  }
+},[connected, stompClient, roomId, currentUser])
+
 
 
   return (
@@ -203,7 +230,11 @@ const ChatPage = () => {
                     Room : <span>{actualRoom}</span>
                 </h1>
             </div>
-
+              {onlineUser && 
+              <div className='text-green-500'>
+                <p>{onlineUser} online</p>
+              </div>
+              }
             <div>
                 <h1>
                     User : <span>{currentUser}</span>
