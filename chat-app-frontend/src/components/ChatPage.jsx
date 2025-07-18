@@ -201,24 +201,21 @@ const ChatPage = () => {
     }
 
     //handle logout
-function handleLogOut() {
-  isLoggingOut.current = true;
-
-  if (client && client.connected) {
-    client.publish({
-      destination: `/app/isOnline/${roomId}`,
-      body: JSON.stringify({ sender: currentUser, type: "offline" }),
-    });
-  }
-
-  // Give time for message to be delivered
-  setTimeout(() => {
-    setConnected(false);
-    navigate("/");
-    toast.success(`User ${currentUser} logout successfully!`);
-  }, 300); // Wait a bit
-}
-
+    function handleLogOut() {
+       isLoggingOut.current = true;
+      // Notify others you're offline
+      stompClient.send(
+        `/app/isOffline/${roomId}`,
+        {},
+        JSON.stringify({ sender: currentUser })
+      );
+      
+        setConnected(false);
+        
+        
+        navigate("/")
+        toast.success(` User ${currentUser} logout successfully !!`);
+    }
 //emoji picker
     useEffect(() => {
   function handleClickOutside(event) {
