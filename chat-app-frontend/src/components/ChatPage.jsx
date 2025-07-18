@@ -194,7 +194,12 @@ const ChatPage = () => {
     //handle logout
     function handleLogOut() {
         setConnected(false);
-        setOnlineUser(null);
+        stompClient.send(
+      `/app/isOnline/${roomId}`,
+      {},
+      JSON.stringify({ sender: currentUser })
+    );
+    setIsOnline(true);
         // setRoomId("");
         // setCurrentUser("");
         navigate("/")
