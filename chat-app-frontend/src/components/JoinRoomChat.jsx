@@ -37,7 +37,7 @@ function decryptRoomId(cipher) {
         [event.target.name] : event.target.value},
       )
     };
-//validating input details
+//validating input details 
 function validation() {
   if(details.userName === "" && details.roomId === "") {
     toast.error(" Please enter input fields!");
