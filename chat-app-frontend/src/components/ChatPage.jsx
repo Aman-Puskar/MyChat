@@ -139,9 +139,13 @@ const ChatPage = () => {
                 const { sender } = JSON.parse(message.body);
                 if (sender !== currentUser) {
                     setOnlineUser(sender);
-                }
+                      client.publish({
+                      destination: `/app/isOnline/${roomId}`,
+                      body: JSON.stringify({ sender: currentUser }),
+                        });
+                    }
+                });
                 
-            });
              client.subscribe(`/topic/isOffline/${roomId}`, (message) => {
                 const { sender } = JSON.parse(message.body);
                 if (sender !== currentUser) {
