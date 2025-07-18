@@ -203,11 +203,16 @@ const ChatPage = () => {
     //handle logout
     function handleLogOut() {
        setIsLoggingOut(true);
+         if (stompClient && stompClient.connected) {
+      // Notify others you're offline
       stompClient.send(
         `/app/isOffline/${roomId}`,
         {},
         JSON.stringify({ sender: currentUser })
       );
+
+      stompClient.deactivate();
+    }
         setConnected(false);
         
         
