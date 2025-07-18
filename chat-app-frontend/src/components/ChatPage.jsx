@@ -17,7 +17,8 @@ const ChatPage = () => {
   //show online status
   const[isOnline, setIsOnline] = useState(false);
   const[onlineUser, setOnlineUser] = useState(null);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  // const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const isLoggingOut = useRef(false);
 
 
     //typing indication
@@ -202,15 +203,15 @@ const ChatPage = () => {
 
     //handle logout
     function handleLogOut() {
-       setIsLoggingOut(true);
-         if (stompClient && stompClient.connected) {
+       isLoggingOut.current = true;
+      if (stompClient && stompClient.connected) {
       // Notify others you're offline
       stompClient.send(
         `/app/isOffline/${roomId}`,
         {},
         JSON.stringify({ sender: currentUser })
       );
-
+      stompClient.reconnectDelay = 0
       stompClient.deactivate();
     }
         setConnected(false);
@@ -241,7 +242,7 @@ useEffect(() => {
     stompClient.connected &&
     roomId &&
     currentUser &&
-     !isLoggingOut
+     !isLoggingOut.current
   ) {
     stompClient.send(
       `/app/isOnline/${roomId}`,
@@ -258,7 +259,7 @@ useEffect(() => {
       stompClient.connected &&
       roomId &&
       currentUser &&
-       !isLoggingOut
+       !isLoggingOut.current
     ) {
       stompClient.send(
         `/app/isOffline/${roomId}`,
