@@ -179,12 +179,21 @@ const ChatPage = () => {
     client.activate(); // Start the connection
 
     return () => {
-        // Cleanup on unmount or roomId change
-        if (client.connected) {
-          
-            client.deactivate();
-        }
-    };
+    if (client.connected) {
+      // Send offline notification before disconnecting
+      if (!isLoggingOut.current) {
+        client.publish({
+          destination: `/app/isOffline/${roomId}`,
+          body: JSON.stringify({ sender: currentUser }),
+        });
+      }
+      
+      // Small delay to ensure message is sent before disconnecting
+      setTimeout(() => {
+        client.deactivate();
+      }, 100);
+    }
+  };
 }, [roomId, connected]);
 
     //handling input messages
@@ -205,21 +214,29 @@ const ChatPage = () => {
     }
 
     //handle logout
-    function handleLogOut() {
-       isLoggingOut.current = true;
-      // Notify others you're offline
-      stompClient.send(
-        `/app/isOffline/${roomId}`,
-        {},
-        JSON.stringify({ sender: currentUser })
-      );
-      
-        setConnected(false);
-        
-        
-        navigate("/")
-        toast.success(` User ${currentUser} logout successfully !!`);
-    }
+   function handleLogOut() {
+  isLoggingOut.current = true;
+  
+  // Send offline notification
+  if (stompClient && stompClient.connected) {
+    stompClient.send(
+      `/app/isOffline/${roomId}`,
+      {},
+      JSON.stringify({ sender: currentUser })
+    );
+    
+    // Small delay to ensure message is sent
+    setTimeout(() => {
+      setConnected(false);
+      navigate("/");
+      toast.success(`User ${currentUser} logged out successfully!`);
+    }, 100);
+  } else {
+    setConnected(false);
+    navigate("/");
+    toast.success(`User ${currentUser} logged out successfully!`);
+  }
+}
 //emoji picker
     useEffect(() => {
   function handleClickOutside(event) {
@@ -258,7 +275,8 @@ useEffect(() => {
       stompClient &&
       stompClient.connected &&
       roomId &&
-      currentUser 
+      currentUser && 
+      !isLoggingOut.current
     ) {
       stompClient.send(
         `/app/isOffline/${roomId}`,
