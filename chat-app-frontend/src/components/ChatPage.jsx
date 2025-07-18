@@ -210,17 +210,39 @@ const ChatPage = () => {
 
 //online status
 useEffect(() => {
-  if(connected && stompClient && stompClient.connected && roomId && currentUser) {
-      stompClient.send(`/app/isOnline/${roomId}`, {}, JSON.stringify({ sender: currentUser }));
-          setIsOnline(true);
+  if (
+    connected &&
+    stompClient &&
+    stompClient.connected &&
+    roomId &&
+    currentUser
+  ) {
+    stompClient.send(
+      `/app/isOnline/${roomId}`,
+      {},
+      JSON.stringify({ sender: currentUser })
+    );
+    setIsOnline(true);
   }
-  else if(stompClient && stompClient.connected && roomId && currentUser) {
-    stompClient.send(`/app/isOffline/${roomId}`, {}, JSON.stringify({ sender: currentUser }));
-          setIsOnline(false);
-  }  else {
+
+  return () => {
+    // Cleanup: mark as offline
+    if (
+      stompClient &&
+      stompClient.connected &&
+      roomId &&
+      currentUser
+    ) {
+      stompClient.send(
+        `/app/isOffline/${roomId}`,
+        {},
+        JSON.stringify({ sender: currentUser })
+      );
+    }
     setIsOnline(false);
-  }
-},[connected, stompClient, roomId, currentUser]);
+  };
+}, [connected, stompClient,roomId, currentUser]);
+
 
 
 
