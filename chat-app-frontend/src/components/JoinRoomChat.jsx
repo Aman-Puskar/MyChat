@@ -39,9 +39,15 @@ function decryptRoomId(cipher) {
     };
 //validating input details
 function validation() {
-  if(details.userName === "" || details.roomId === "") {
-    toast.error("Invalid input fields!");
+  if(details.userName === "" && details.roomId === "") {
+    toast.error(" Please enter input fields!");
     return false;
+  } else if(details.userName === "") {
+    toast.error("Please enter username");
+     return false;
+  } else if(details.roomId === "") {
+    toast.error("Please enter room id");
+    return  false;
   }
   return true;
 }
