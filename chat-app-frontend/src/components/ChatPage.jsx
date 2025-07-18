@@ -108,7 +108,7 @@ const ChatPage = () => {
         debug: (str) => console.log('[STOMP]', str), 
         onConnect: () => {
              setStompClient({
-        send: (destination, headers, body) => {
+             send: (destination, headers, body) => {
             client.publish({ destination, headers, body });
         }
     });
@@ -142,12 +142,15 @@ const ChatPage = () => {
                 const { sender } = JSON.parse(message.body);
                 if (sender !== currentUser) {
                     setOnlineUser(sender);
+                    if(!isLoggingOut.current) {
                       client.publish({
                       destination: `/app/isOnline/${roomId}`,
                       body: JSON.stringify({ sender: currentUser }),
                         });
-                    }
+                    } 
+                }
                 });
+              
 
              client.subscribe(`/topic/isOffline/${roomId}`, (message) => {
                 const { sender } = JSON.parse(message.body);
@@ -178,6 +181,7 @@ const ChatPage = () => {
     return () => {
         // Cleanup on unmount or roomId change
         if (client.connected) {
+          
             client.deactivate();
         }
     };
