@@ -210,11 +210,11 @@ const ChatPage = () => {
         JSON.stringify({ sender: currentUser })
       );
       
-        setConnected(false);
-        
-        
-        navigate("/")
-        toast.success(` User ${currentUser} logout successfully !!`);
+        setTimeout(() => {
+    setConnected(false);
+    navigate("/");
+    toast.success(`User ${currentUser} logout successfully!`);
+  }, 500);
     }
 //emoji picker
     useEffect(() => {
