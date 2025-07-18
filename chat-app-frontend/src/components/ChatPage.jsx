@@ -174,7 +174,7 @@ const ChatPage = () => {
             toast.error("WebSocket connection failed");
         },
     });
-    setRealClient(client);
+    // setRealClient(client);
     client.activate(); // Start the connection
 
     return () => {
@@ -205,7 +205,6 @@ const ChatPage = () => {
     //handle logout
     function handleLogOut() {
        isLoggingOut.current = true;
-      if (stompClient && stompClient.connected) {
       // Notify others you're offline
       stompClient.send(
         `/app/isOffline/${roomId}`,
@@ -213,7 +212,6 @@ const ChatPage = () => {
         JSON.stringify({ sender: currentUser })
       );
       
-    }
         setConnected(false);
         
         
