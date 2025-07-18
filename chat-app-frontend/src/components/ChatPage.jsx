@@ -264,7 +264,7 @@ useEffect(() => {
     }
     setIsOnline(false);
   };
-}, [connected, stompClient,roomId, currentUser, isLoggingOut]);
+}, [connected, stompClient,roomId, currentUser,]);
 
 
 
