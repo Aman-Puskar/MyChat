@@ -45,7 +45,6 @@ const ChatPage = () => {
     const [input, setInput] = useState("");
     const chatBoxRef = useRef(null);
     const [stompClient, setStompClient] = useState(null);
-    const [realClient, setRealClient] = useState(null);
 
 
     //scrol the main message container
@@ -257,7 +256,7 @@ useEffect(() => {
       stompClient.connected &&
       roomId &&
       currentUser &&
-       !isLoggingOut.current
+      isLoggingOut.current
     ) {
       stompClient.send(
         `/app/isOffline/${roomId}`,
