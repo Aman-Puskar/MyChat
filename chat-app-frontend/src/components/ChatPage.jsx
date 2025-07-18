@@ -211,8 +211,7 @@ const ChatPage = () => {
         {},
         JSON.stringify({ sender: currentUser })
       );
-      stompClient.reconnectDelay = 0
-      stompClient.deactivate();
+      
     }
         setConnected(false);
         
