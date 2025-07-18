@@ -200,12 +200,13 @@ const ChatPage = () => {
 
     //handle logout
     function handleLogOut() {
-        setConnected(false);
-        stompClient.send(
+      stompClient.send(
         `/app/isOffline/${roomId}`,
         {},
         JSON.stringify({ sender: currentUser })
       );
+        setConnected(false);
+        
         
         navigate("/")
         toast.success(` User ${currentUser} logout successfully !!`);
