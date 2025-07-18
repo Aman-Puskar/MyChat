@@ -140,6 +140,7 @@ const ChatPage = () => {
                 if (sender !== currentUser) {
                     setOnlineUser(sender);
                 }
+                
             });
              client.subscribe(`/topic/isOffline/${roomId}`, (message) => {
                 const { sender } = JSON.parse(message.body);
@@ -147,10 +148,12 @@ const ChatPage = () => {
                     setOnlineUser(null);
                 }
             });
-            client.publish({
+            setTimeout(() => {
+             client.publish({
             destination: `/app/isOnline/${roomId}`,
-            body: JSON.stringify({ sender: currentUser }),
-          });
+             body: JSON.stringify({ sender: currentUser }),
+                });
+                }, 800);
 
         },
         onStompError: (frame) => {
