@@ -147,6 +147,11 @@ const ChatPage = () => {
                     setOnlineUser(null);
                 }
             });
+            client.publish({
+            destination: `/app/isOnline/${roomId}`,
+            body: JSON.stringify({ sender: currentUser }),
+          });
+
         },
         onStompError: (frame) => {
             console.error("STOMP Error:", frame.headers['message']);
@@ -254,11 +259,13 @@ useEffect(() => {
                     Room : <span>{actualRoom}</span>
                 </h1>
             </div>
+
               {onlineUser && (
               <div className='text-green-500'>
                 <p>{onlineUser} online</p>
               </div>
               )}
+
             <div>
                 <h1>
                     User : <span>{currentUser}</span>
