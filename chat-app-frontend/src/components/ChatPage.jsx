@@ -254,7 +254,8 @@ useEffect(() => {
       stompClient &&
       stompClient.connected &&
       roomId &&
-      currentUser 
+      currentUser &&
+      !isLoggingOut
     ) {
       stompClient.send(
         `/app/isOffline/${roomId}`,
@@ -264,7 +265,7 @@ useEffect(() => {
     }
     setIsOnline(false);
   };
-}, [connected, stompClient,roomId, currentUser,]);
+}, [connected, stompClient,roomId, currentUser,isLoggingOut]);
 
 
 
