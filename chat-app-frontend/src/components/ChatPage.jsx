@@ -17,6 +17,8 @@ const ChatPage = () => {
   //show online status
   const[isOnline, setIsOnline] = useState(false);
   const[onlineUser, setOnlineUser] = useState(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
 
     //typing indication
     const [isTyping, setIsTyping] = useState(false); // you are typing
@@ -200,6 +202,7 @@ const ChatPage = () => {
 
     //handle logout
     function handleLogOut() {
+       setIsLoggingOut(true);
       stompClient.send(
         `/app/isOffline/${roomId}`,
         {},
@@ -232,7 +235,8 @@ useEffect(() => {
     stompClient &&
     stompClient.connected &&
     roomId &&
-    currentUser
+    currentUser &&
+     !isLoggingOut
   ) {
     stompClient.send(
       `/app/isOnline/${roomId}`,
@@ -248,7 +252,8 @@ useEffect(() => {
       stompClient &&
       stompClient.connected &&
       roomId &&
-      currentUser
+      currentUser &&
+       !isLoggingOut
     ) {
       stompClient.send(
         `/app/isOffline/${roomId}`,
@@ -258,7 +263,7 @@ useEffect(() => {
     }
     setIsOnline(false);
   };
-}, [connected, stompClient,roomId, currentUser]);
+}, [connected, stompClient,roomId, currentUser, isLoggingOut]);
 
 
 
