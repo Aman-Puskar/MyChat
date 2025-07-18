@@ -138,16 +138,21 @@ const ChatPage = () => {
             });
 
             //isonline status
-            client.subscribe(`/topic/isOnline/${roomId}`, (message) => {
-                const { sender } = JSON.parse(message.body);
-                if (sender !== currentUser) {
-                    setOnlineUser(sender);
-                      client.publish({
-                      destination: `/app/isOnline/${roomId}`,
-                      body: JSON.stringify({ sender: currentUser }),
-                        });
-                    }
-                });
+           client.subscribe(`/topic/isOnline/${roomId}`, (message) => {
+    const { sender, type } = JSON.parse(message.body);
+    if (sender !== currentUser) {
+        setOnlineUser(sender);
+
+        // Only reply back if this was a fresh request
+        if (type === "request") {
+            client.publish({
+                destination: `/app/isOnline/${roomId}`,
+                body: JSON.stringify({ sender: currentUser, type: "ack" }),
+            });
+        }
+    }
+});
+
 
              client.subscribe(`/topic/isOffline/${roomId}`, (message) => {
                 const { sender } = JSON.parse(message.body);
@@ -156,11 +161,11 @@ const ChatPage = () => {
                 }
             });
             setTimeout(() => {
-             client.publish({
-            destination: `/app/isOnline/${roomId}`,
-             body: JSON.stringify({ sender: currentUser }),
-                });
-                }, 800);
+    client.publish({
+        destination: `/app/isOnline/${roomId}`,
+        body: JSON.stringify({ sender: currentUser, type: "request" }),
+    });
+}, 800)
 
         },
         onStompError: (frame) => {
@@ -231,40 +236,40 @@ const ChatPage = () => {
 }, []);
 
 //online status
-useEffect(() => {
-  if (
-    connected &&
-    stompClient &&
-    stompClient.connected &&
-    roomId &&
-    currentUser &&
-     !isLoggingOut.current
-  ) {
-    stompClient.send(
-      `/app/isOnline/${roomId}`,
-      {},
-      JSON.stringify({ sender: currentUser })
-    );
-    setIsOnline(true);
-  }
+// useEffect(() => {
+//   if (
+//     connected &&
+//     stompClient &&
+//     stompClient.connected &&
+//     roomId &&
+//     currentUser &&
+//      !isLoggingOut.current
+//   ) {
+//     stompClient.send(
+//       `/app/isOnline/${roomId}`,
+//       {},
+//       JSON.stringify({ sender: currentUser })
+//     );
+//     setIsOnline(true);
+//   }
 
-  return () => {
-    // Cleanup: mark as offline
-    if (
-      stompClient &&
-      stompClient.connected &&
-      roomId &&
-      currentUser 
-    ) {
-      stompClient.send(
-        `/app/isOffline/${roomId}`,
-        {},
-        JSON.stringify({ sender: currentUser })
-      );
-    }
-    setIsOnline(false);
-  };
-}, [connected, stompClient,roomId, currentUser]);
+//   return () => {
+//     // Cleanup: mark as offline
+//     if (
+//       stompClient &&
+//       stompClient.connected &&
+//       roomId &&
+//       currentUser 
+//     ) {
+//       stompClient.send(
+//         `/app/isOffline/${roomId}`,
+//         {},
+//         JSON.stringify({ sender: currentUser })
+//       );
+//     }
+//     setIsOnline(false);
+//   };
+// }, [connected, stompClient,roomId, currentUser]);
 
 
 
