@@ -254,11 +254,11 @@ useEffect(() => {
                     Room : <span>{actualRoom}</span>
                 </h1>
             </div>
-              {onlineUser && 
+              {onlineUser && (
               <div className='text-green-500'>
                 <p>{onlineUser} online</p>
               </div>
-              }
+              )}
             <div>
                 <h1>
                     User : <span>{currentUser}</span>
