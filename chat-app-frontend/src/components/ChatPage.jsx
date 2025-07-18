@@ -194,6 +194,7 @@ const ChatPage = () => {
     //handle logout
     function handleLogOut() {
         setConnected(false);
+        setOnlineUser(null);
         // setRoomId("");
         // setCurrentUser("");
         navigate("/")
