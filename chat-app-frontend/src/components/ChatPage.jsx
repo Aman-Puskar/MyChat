@@ -108,7 +108,7 @@ const ChatPage = () => {
         debug: (str) => console.log('[STOMP]', str), 
         onConnect: () => {
              setStompClient({
-             send: (destination, headers, body) => {
+        send: (destination, headers, body) => {
             client.publish({ destination, headers, body });
         }
     });
@@ -142,15 +142,12 @@ const ChatPage = () => {
                 const { sender } = JSON.parse(message.body);
                 if (sender !== currentUser) {
                     setOnlineUser(sender);
-                    if(!isLoggingOut.current) {
                       client.publish({
                       destination: `/app/isOnline/${roomId}`,
                       body: JSON.stringify({ sender: currentUser }),
                         });
-                    } 
-                }
+                    }
                 });
-              
 
              client.subscribe(`/topic/isOffline/${roomId}`, (message) => {
                 const { sender } = JSON.parse(message.body);
@@ -179,20 +176,11 @@ const ChatPage = () => {
     client.activate(); // Start the connection
 
     return () => {
-    if (client.connected) {
-      // Send offline notification before disconnecting
-      if (!isLoggingOut.current) {
-        client.publish({
-          destination: `/app/isOffline/${roomId}`,
-          body: JSON.stringify({ sender: currentUser }),
-        });
-        client.deactivate(); // No delay needed
-
-      }
-      
-     
-    }
-  };
+        // Cleanup on unmount or roomId change
+        if (client.connected) {
+            client.deactivate();
+        }
+    };
 }, [roomId, connected]);
 
     //handling input messages
@@ -213,29 +201,24 @@ const ChatPage = () => {
     }
 
     //handle logout
-   function handleLogOut() {
+function handleLogOut() {
   isLoggingOut.current = true;
-  
-  // Send offline notification
-  if (stompClient && stompClient.connected) {
-    stompClient.send(
-      `/app/isOffline/${roomId}`,
-      {},
-      JSON.stringify({ sender: currentUser })
-    );
-    
-    // Small delay to ensure message is sent
-    setTimeout(() => {
-      setConnected(false);
-      navigate("/");
-      toast.success(`User ${currentUser} logged out successfully!`);
-    }, 100);
-  } else {
+
+  if (client && client.connected) {
+    client.publish({
+      destination: `/app/isOnline/${roomId}`,
+      body: JSON.stringify({ sender: currentUser, type: "offline" }),
+    });
+  }
+
+  // Give time for message to be delivered
+  setTimeout(() => {
     setConnected(false);
     navigate("/");
-    toast.success(`User ${currentUser} logged out successfully!`);
-  }
+    toast.success(`User ${currentUser} logout successfully!`);
+  }, 300); // Wait a bit
 }
+
 //emoji picker
     useEffect(() => {
   function handleClickOutside(event) {
@@ -274,8 +257,7 @@ useEffect(() => {
       stompClient &&
       stompClient.connected &&
       roomId &&
-      currentUser && 
-      !isLoggingOut.current
+      currentUser 
     ) {
       stompClient.send(
         `/app/isOffline/${roomId}`,
