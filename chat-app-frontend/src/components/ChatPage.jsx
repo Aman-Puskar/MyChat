@@ -186,12 +186,11 @@ const ChatPage = () => {
           destination: `/app/isOffline/${roomId}`,
           body: JSON.stringify({ sender: currentUser }),
         });
+        client.deactivate(); // No delay needed
+
       }
       
-      // Small delay to ensure message is sent before disconnecting
-      setTimeout(() => {
-        client.deactivate();
-      }, 100);
+     
     }
   };
 }, [roomId, connected]);
