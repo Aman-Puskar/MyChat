@@ -145,7 +145,7 @@ const ChatPage = () => {
                         });
                     }
                 });
-                
+
              client.subscribe(`/topic/isOffline/${roomId}`, (message) => {
                 const { sender } = JSON.parse(message.body);
                 if (sender !== currentUser) {
@@ -202,13 +202,11 @@ const ChatPage = () => {
     function handleLogOut() {
         setConnected(false);
         stompClient.send(
-      `/app/isOnline/${roomId}`,
-      {},
-      JSON.stringify({ sender: currentUser })
-    );
-    setIsOnline(true);
-        // setRoomId("");
-        // setCurrentUser("");
+        `/app/isOffline/${roomId}`,
+        {},
+        JSON.stringify({ sender: currentUser })
+      );
+        
         navigate("/")
         toast.success(` User ${currentUser} logout successfully !!`);
     }
