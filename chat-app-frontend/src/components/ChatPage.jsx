@@ -210,15 +210,17 @@ const ChatPage = () => {
 
 //online status
 useEffect(() => {
-  if(connected && stompClient) {
+  if(connected && stompClient && stompClient.connected && roomId && currentUser) {
       stompClient.send(`/app/isOnline/${roomId}`, {}, JSON.stringify({ sender: currentUser }));
           setIsOnline(true);
   }
-  else {
+  else if(stompClient && stompClient.connected && roomId && currentUser) {
     stompClient.send(`/app/isOffline/${roomId}`, {}, JSON.stringify({ sender: currentUser }));
           setIsOnline(false);
+  }  else {
+    setIsOnline(false);
   }
-},[connected, stompClient, roomId, currentUser])
+},[connected, stompClient, roomId, currentUser]);
 
 
 
