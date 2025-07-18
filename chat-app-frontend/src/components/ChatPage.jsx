@@ -271,6 +271,23 @@ useEffect(() => {
 
 
 
+useEffect(() => {
+  const handleBeforeUnload = () => {
+    if (stompClient.current?.connected) {
+      stompClient.current.send(
+        `/app/isOffline/${roomId}`,
+        {},
+        JSON.stringify({ sender: currentUser })
+      );
+    }
+  };
+
+  window.addEventListener("beforeunload", handleBeforeUnload);
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+  };
+}, [roomId, currentUser]);
+
 
   return (
     <div>
