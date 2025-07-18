@@ -45,6 +45,7 @@ const ChatPage = () => {
     const [input, setInput] = useState("");
     const chatBoxRef = useRef(null);
     const [stompClient, setStompClient] = useState(null);
+    const [realClient, setRealClient] = useState(null);
 
 
     //scrol the main message container
@@ -173,7 +174,7 @@ const ChatPage = () => {
             toast.error("WebSocket connection failed");
         },
     });
-
+    setRealClient(client);
     client.activate(); // Start the connection
 
     return () => {
@@ -202,22 +203,38 @@ const ChatPage = () => {
     }
 
     //handle logout
-    function handleLogOut() {
+     async function handleLogOut() {
        isLoggingOut.current = true;
-      if (stompClient && stompClient.connected) {
-      // Notify others you're offline
+      try {
+    // Notify server that user is going offline
+    if (stompClient && connected) {
       stompClient.send(
         `/app/isOffline/${roomId}`,
         {},
         JSON.stringify({ sender: currentUser })
       );
-      
     }
-        setConnected(false);
-        
-        
-        navigate("/")
-        toast.success(` User ${currentUser} logout successfully !!`);
+
+    // Wait to ensure the message is sent
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    // Properly close the connection
+    if (realClient && realClient.connected) {
+      await realClient.deactivate();
+    }
+
+    // Reset chat state
+    setConnected(false);
+    setOnlineUser(null);
+    setTypingUser(null);
+    setMessages([]);
+
+    toast.success(`User ${currentUser} logged out successfully!`);
+    navigate("/");
+  } catch (err) {
+    console.error("Logout error:", err);
+    toast.error("Logout failed");
+  }
     }
 //emoji picker
     useEffect(() => {
