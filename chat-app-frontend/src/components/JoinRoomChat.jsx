@@ -141,7 +141,7 @@ function validation() {
               value={details.roomId}
               name="roomId"
               placeholder='Enter room id'
-              type='text'
+              type='password'
               id='name'
               className='w-full bg-gray-600 px-4 py-2 border-gray-300 rounded-lg mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500'
             />
