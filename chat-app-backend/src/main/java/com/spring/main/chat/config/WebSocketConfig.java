@@ -15,7 +15,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // here connnection will going to be established
         registry.addEndpoint("/chat")
                 .setAllowedOriginPatterns("https://mychat-theta-seven.vercel.app", "http://localhost:5173",
-                        "https://talk-circuit.vercel.app/")
+                        "https://talk-circuit.vercel.app")
                 .withSockJS();
     }
 
