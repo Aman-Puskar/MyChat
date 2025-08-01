@@ -38,6 +38,7 @@ const ChatPage = () => {
     useEffect(() => {
         if(!connected) {
             navigate('/');
+            // handleLogOut();
         }
     }, [connected, roomId, currentUser]);
     
@@ -235,62 +236,35 @@ const ChatPage = () => {
   };
 }, []);
 
-//online status
-// useEffect(() => {
-//   if (
-//     connected &&
-//     stompClient &&
-//     stompClient.connected &&
-//     roomId &&
-//     currentUser &&
-//      !isLoggingOut.current
-//   ) {
-//     stompClient.send(
-//       `/app/isOnline/${roomId}`,
-//       {},
-//       JSON.stringify({ sender: currentUser })
-//     );
-//     setIsOnline(true);
-//   }
 
-//   return () => {
-//     // Cleanup: mark as offline
-//     if (
-//       stompClient &&
-//       stompClient.connected &&
-//       roomId &&
-//       currentUser 
-//     ) {
-//       stompClient.send(
-//         `/app/isOffline/${roomId}`,
-//         {},
-//         JSON.stringify({ sender: currentUser })
-//       );
-//     }
-//     setIsOnline(false);
-//   };
-// }, [connected, stompClient,roomId, currentUser]);
 
 
 
 
   return (
     <div>
-        <header className='border-gray-400 fixed w-full bg-gray-800 py-5 flex justify-around rounded shadow items-center'>
+        <header className='border-gray-400 fixed w-full bg-gray-900 py-5 flex justify-around rounded shadow items-center'>
             <div >
-                <h1>
+                <h1 className='text-amber-50'>
                     Room : <span>{actualRoom}</span>
                 </h1>
             </div>
 
-              {onlineUser && (
-              <div className='text-green-500'>
-                <p>{onlineUser} online</p>
-              </div>
-              )}
+{onlineUser && (
+  <div className="text-sm font-bold">
+    <p className="bg-gradient-to-r from-green-500 to-green-500 
+                   bg-clip-text text-transparent 
+                   drop-shadow-[0_0_8px_rgba(34,197,94,0.9)] 
+                   tracking-wide">
+      {onlineUser} online
+    </p>
+  </div>
+)}
+
+
 
             <div>
-                <h1>
+                <h1 className='text-amber-50'>
                     User : <span>{currentUser}</span>
                 </h1>
             </div>
@@ -304,17 +278,20 @@ const ChatPage = () => {
 
 
 
-    <main ref={chatBoxRef} className='pt-20 pb-[72px] border w-full md:w-2/3 mx-auto bg-gray-500 h-screen overflow-y-auto px-3 md:px-7 flex flex-col'>
+    <main ref={chatBoxRef} className='pt-20 pb-[72px] border w-full md:w-2/3 mx-auto 
+             bg-[url("/background_images/chat-bg-image2.jpg")] 
+             bg-cover bg-center bg-no-repeat h-screen 
+             overflow-y-auto px-3 md:px-7 flex flex-col'>
        {
         messages.map((message, index) => (
            <div key={index} className={`flex ${message.sender === currentUser ? "justify-end" : "justify-start"} mt-2`}>
-             <div className={`'mt-3  rounded text-gray-900 ${message.sender === currentUser ? "bg-gray-100" : "bg-green-200"}`} >
+             <div className={`'mt-3  rounded text-lime-50 ${message.sender === currentUser ? "bg-purple-600" : "bg-gray-600"}`} >
                 <div className='flex flex-row gap-2'>
-                    <img className='h-10 w-10 p-1 ' src={`https://ui-avatars.com/api/?name=${message.sender}&background=random`} alt="" />
-                    <div className='flex flex-col gap-2 px-1'>
+                    <img className='h-10 w-10 p-1'    src={`https://robohash.org/${message.sender}?set=set2`}alt="" />
+                    <div className='flex flex-col px-1'>
                     <p className='font-bold text-sm'>{message.sender}</p>
                     <p>{message.content}</p>
-                    <p className='text-xs text-gray-950'>{getTimeAgo(message.timeStamp)}</p>
+                    <p className='text-xs text-white'>{getTimeAgo(message.timeStamp)}</p>
                     </div>
                 </div>
             </div>
@@ -330,7 +307,7 @@ const ChatPage = () => {
     </main>
 
 <div className='fixed bottom-0 w-full px-2'>
-  <div className='w-full md:w-2/3 mx-auto flex items-center gap-2 bg-gray-800 px-3 py-3 rounded-full h-16'>
+  <div className='w-full md:w-2/3 mx-auto flex items-center gap-2 bg-gray-900 px-3 py-3 rounded-full h-16'>
 
     <input
       type="text"

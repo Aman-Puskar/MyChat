@@ -104,19 +104,24 @@ function validation() {
 
 
   return (
-    <div className='min-h-screen flex justify-center items-center'>
-        <div className='p-10 w-full flex flex-col gap-4 max-w-md rounded bg-gray-800  shadow'>
+    <div className='min-h-screen flex justify-center items-center '>
+        <div className='p-10 w-full flex flex-col gap-4 max-w-md rounded-xl text-white
+                bg-white/10 md:backdrop-blur-md border border-white/30 
+                '>
 
+        <h1 className='text-6xl text-amber-50 font-semibold text-center'>
+            Talk Circuit
+          </h1>
         <div >
-          <img src={chatIcon} className='mx-auto w-fit' alt="chat icon" />
+          <img src={chatIcon} className='mx-auto w-28' alt="chat icon" />
         </div>
 
-          <h1 className='text-3xl font-semibold text-center'>
+          <h1 className='text-2xl text-amber-50 font-semibold text-center'>
             Join Room / Create Room
           </h1>
 
           {/*input for user name */}
-          <div>
+          <div className='mt-1.5'>
             <label htmlFor="name" className='block font-medium'>
               Your Name
             </label>
@@ -127,7 +132,7 @@ function validation() {
               id='name'
               name='userName'
               placeholder='Enter your name'
-              className='w-full bg-gray-600 px-4 py-2 border-gray-300 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full bg-white/20 text-white  placeholder-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400'
             />
           </div>
 
@@ -143,13 +148,13 @@ function validation() {
               placeholder='Enter room id'
               type='text'
               id='name'
-              className='w-full bg-gray-600 px-4 py-2 border-gray-300 rounded-lg mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full bg-white/20 text-white placeholder-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400'
             />
           </div>
 
         <div className='flex justify-center gap-8 mt-5'>
-          <button onClick={joinRoomChat} className='px-3 py-2 text-black bg-blue-500 rounded hover:bg-blue-800 hover:text-gray-50'  >Join Room</button>
-          <button onClick={createRoom} className='px-3 py-2 text-black bg-emerald-400 rounded hover:bg-emerald-700 hover:text-gray-50' >Create Room</button>
+          <button onClick={joinRoomChat} className='px-3 py-2 text-amber-50 bg-blue-500 rounded hover:bg-blue-800 hover:text-gray-50'  >Join Room</button>
+          <button onClick={createRoom} className='px-3 py-2 text-amber-50 bg-emerald-400 rounded hover:bg-emerald-700 hover:text-gray-50' >Create Room</button>
         </div>
 
 
