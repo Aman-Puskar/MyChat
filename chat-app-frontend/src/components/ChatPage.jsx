@@ -310,7 +310,7 @@ const ChatPage = () => {
           </div>
         ))}
         {typingUser && (
-          <div className="mt-2 text-lg italic text-gray-100">
+          <div className="mt-2 text-lg italic text-gray-100 animate-pulse">
             {typingUser} is typing...
           </div>
         )}
