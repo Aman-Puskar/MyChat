@@ -10,5 +10,8 @@ export default defineConfig({
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+      require('tailwind-scrollbar'),
+
+  ],
 })

@@ -40,15 +40,21 @@ function decryptRoomId(cipher) {
 //validating input details  
 function validation() {
   if(details.userName === "" && details.roomId === "") {
+    
     toast.error(" Please enter input fields!");
     return false;
-  } else if(details.userName === "") {
+  } 
+ 
+  else if(details.userName === "") {
     toast.error("Please enter username");
      return false;
   } else if(details.roomId === "") {
     toast.error("Please enter room id");
     return  false;
-  }
+  }  else if(details.roomId.length < 6) {
+    toast.error("Room ID too short. Minimum length is 6.")
+    return false;
+    }
   return true;
 }
 
@@ -64,7 +70,9 @@ function validation() {
             setRoomId(encryptedRoomId);
             setCurrentUser(details.userName); 
             setConnected(true);   
-            toast.success("Room joined successfully !!");
+            // toast.success("Room joined successfully !!");
+            toast.success(`Welcome to the room, ${details.userName}!`);
+
             navigate('/chat');
 
         } catch(error) {
@@ -85,8 +93,9 @@ function validation() {
             setActualRoom(details.roomId);
             const encryptedRoomId = encryptRoomId(details.roomId);
             const response = await createRoomApi(encryptedRoomId);            
-            toast.success("Room created successfully !");
-            console.log(response);
+            // toast.success("Room created successfully !");
+            toast.success(`Hi ${details.userName}, your room is ready!`);
+            // console.log(response);
             setRoomId(encryptedRoomId);
             setCurrentUser(details.userName); 
             setConnected(true);           
@@ -129,7 +138,7 @@ function validation() {
               onChange={handleFormInputChange}
               value={details.userName}
               type='text'
-              id='name'
+              // id='name'
               name='userName'
               placeholder='Enter your name'
               className='w-full bg-white/20 text-white  placeholder-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400'
@@ -147,14 +156,14 @@ function validation() {
               name="roomId"
               placeholder='Enter room id'
               type='password'
-              id='name'
+              // id='name'
               className='w-full bg-white/20 text-white placeholder-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400'
             />
           </div>
 
         <div className='flex justify-center gap-8 mt-5'>
-          <button onClick={joinRoomChat} className='px-3 py-2 text-amber-50 bg-blue-500 rounded hover:bg-blue-800 hover:text-gray-50'  >Join Room</button>
-          <button onClick={createRoom} className='px-3 py-2 text-amber-50 bg-emerald-400 rounded hover:bg-emerald-700 hover:text-gray-50' >Create Room</button>
+          <button onClick={joinRoomChat} className='px-3 py-2 text-amber-50 bg-blue-500 rounded hover:bg-blue-800 hover:text-gray-50 active:bg-blue-900 active:scale-95 transition duration-150'   >Join Room</button>
+          <button onClick={createRoom} className='px-3 py-2 text-amber-50 bg-emerald-500 rounded hover:bg-emerald-700 hover:text-gray-50 active:bg-emerald-900 active:scale-95 transition duration-150' >Create Room</button>
         </div>
 
 

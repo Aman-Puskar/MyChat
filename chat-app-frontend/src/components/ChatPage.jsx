@@ -14,8 +14,7 @@ import EmojiPicker from "emoji-picker-react";
 
 const ChatPage = () => {
   //show online status
-  const [isOnline, setIsOnline] = useState(false);
-  const [onlineUser, setOnlineUser] = useState(null);
+  const [onlineUsers, setOnlineUsers] = useState(new Set());
   // const [isLoggingOut, setIsLoggingOut] = useState(false);
   const isLoggingOut = useRef(false);
 
@@ -50,6 +49,17 @@ const ChatPage = () => {
   const [input, setInput] = useState("");
   const chatBoxRef = useRef(null);
   const [stompClient, setStompClient] = useState(null);
+  const onlineList = useRef(null);
+
+
+    useEffect(() => {
+    if (onlineList.current) {
+      onlineList.current.scrollTo({
+        top: onlineList.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [onlineUsers]);
 
   //scrol the main message container
   useEffect(() => {
@@ -106,7 +116,7 @@ const ChatPage = () => {
             client.publish({ destination, headers, body });
           },
         });
-        toast.success("Connected to STOMP");
+        toast.success("You’re good to go!");
 
         // Subscribe to room messages
         client.subscribe(`/topic/room/${roomId}`, (message) => {
@@ -135,7 +145,9 @@ const ChatPage = () => {
         client.subscribe(`/topic/isOnline/${roomId}`, (message) => {
           const { sender, type } = JSON.parse(message.body);
           if (sender !== currentUser) {
-            setOnlineUser(sender);
+            // setOnlineUser(sender);
+              setOnlineUsers((prev) => new Set([...prev, sender]));
+
 
             // Only reply back if this was a fresh request
             if (type === "request") {
@@ -147,12 +159,18 @@ const ChatPage = () => {
           }
         });
 
+        //user offline
         client.subscribe(`/topic/isOffline/${roomId}`, (message) => {
           const { sender } = JSON.parse(message.body);
           if (sender !== currentUser) {
-            setOnlineUser(null);
+            setOnlineUsers((prev) => {
+              const updated = new Set(prev);
+              updated.delete(sender);
+              return updated;
+            });
           }
         });
+
         setTimeout(() => {
           client.publish({
             destination: `/app/isOnline/${roomId}`,
@@ -231,42 +249,44 @@ const ChatPage = () => {
 
   return (
     <div>
-      <header className="border-gray-400 fixed w-full bg-gray-900 py-5 flex justify-around rounded shadow items-center">
-        {/* <div >
-                <h1 className='text-amber-50'>
-                    Room : <span>{actualRoom}</span>
-                </h1>
-            </div> */}
+      <header className="border-gray-400 fixed w-full bg-gray-900 py-7 flex justify-around rounded shadow items-center">
+       
 
         <div>
-          <h1 className="text-amber-50">
+          <h1 className="text-amber-50 text-xl">
             User : <span>{currentUser}</span>
           </h1>
         </div>
 
-        {onlineUser && (
-          <div className="text-sm font-bold">
-            <p
-              className="bg-gradient-to-r from-green-500 to-green-500 
-                   bg-clip-text text-transparent 
-                   drop-shadow-[0_0_8px_rgba(34,197,94,0.9)] 
-                   tracking-wide"
-            >
-              {onlineUser} online
-            </p>
-          </div>
-        )}
-
-        {/* <div>
-                <h1 className='text-amber-50'>
-                    User : <span>{currentUser}</span>
-                </h1>
-            </div> */}
-
+       <div className="flex gap-1.5"> 
+        <div className="flex justify-center items-center text-xl text-amber-50">
+           <p>Users Online:</p>
+        </div>
+ 
+      <div className={`w-32 h-12 ${onlineUsers.size == 0 ? "border-0" : "border"}  border-green-500 rounded-md px-2 py-1`}>
+        {onlineUsers.size === 0 ? (
+          <p className="text-red-700 py-2 text-xl">None Online</p>
+        ) : (
+          <div ref={onlineList} className="overflow-y-auto h-full scrollbar-thin">
+            {[...onlineUsers].map((user) => (
+           <div
+             key={user}
+            className="flex items-center gap-1 text-sm text-green-400 truncate"
+          >
+          <div className="w-2 h-2 rounded-full bg-green-400" />
+              {user}
+         </div>
+        ))}
+      </div>
+      )}
+  
+</div>
+</div>
+ 
         <div>
           <button
             onClick={handleLogOut}
-            className="bg-red-500 hover:bg-red-800 px-3 py-2 rounded-xl"
+            className="bg-red-500 hover:bg-red-800 px-3 py-2 text-xl text-amber-50 rounded-xl active:bg-red-700 active:scale-95 transition duration-150"
           >
             Leave Room
           </button>
@@ -275,7 +295,7 @@ const ChatPage = () => {
 
       <main
         ref={chatBoxRef}
-        className='pt-20 pb-[72px] border w-full md:w-2/3 mx-auto 
+        className='pt-24 pb-[72px] border w-full md:w-2/3 mx-auto 
              bg-[url("/background_images/chat-bg-image2.jpg")] 
              bg-cover bg-center bg-no-repeat h-screen 
              overflow-y-auto px-3 md:px-7 flex flex-col'
@@ -376,7 +396,8 @@ const ChatPage = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              className="bg-yellow-300 p-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-yellow-600 text-lg md:text-xl"
+              className="bg-yellow-300 p-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-yellow-600 text-lg md:text-xl
+                            active:bg-yellow-800 active:scale-95 transition duration-150"
             >
               😊
             </button>
@@ -387,7 +408,7 @@ const ChatPage = () => {
 
             <button
               onClick={sendMessage}
-              className="bg-blue-400 p-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-blue-700"
+              className="bg-blue-400 p-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-blue-700 active:bg-blue-900 active:scale-95 transition duration-150"
             >
               <MdSend size={20} />
             </button>
