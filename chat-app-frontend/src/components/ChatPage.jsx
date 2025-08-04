@@ -38,12 +38,11 @@ const ChatPage = () => {
   // console.log(currentUser);
 
   //use effect -> whenever something is changes it will redirect to the home page that is form page
-  useEffect(() => {
-    if (!connected) {
-      navigate("/");
-      // handleLogOut();
-    }
-  }, [connected, roomId, currentUser]);
+ useEffect(() => {
+  if (!connected || !currentUser || !roomId) {
+    navigate("/", { replace: true });
+  }
+}, []);
 
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -230,6 +229,30 @@ const ChatPage = () => {
       toast.success(`User ${currentUser} logout successfully!`);
     }, 500);
   }
+//when page is reloaded or close 
+useEffect(() => {
+  const handleUnload = () => {
+    if (stompClient && stompClient.send && currentUser && roomId) {
+      try {
+        stompClient.send(
+          `/app/isOffline/${roomId}`,
+          {},
+          JSON.stringify({ sender: currentUser })
+        );
+      } catch (e) {
+        console.warn("Unload offline signal failed", e);
+      }
+    }
+  };
+
+  window.addEventListener("beforeunload", handleUnload);
+
+  return () => {
+    window.removeEventListener("beforeunload", handleUnload);
+  };
+}, [stompClient, currentUser, roomId]);
+
+
   //emoji picker
   useEffect(() => {
     function handleClickOutside(event) {
