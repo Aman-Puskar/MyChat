@@ -276,19 +276,19 @@ useEffect(() => {
        
 
         <div>
-          <h1 className="text-amber-50 text-xl">
+          <h1 className="text-amber-50 text-sm sm:text-base md:text-lg lg:text-xl">
             User : <span>{currentUser}</span>
           </h1>
         </div>
 
        <div className="flex gap-1.5"> 
-        <div className="flex justify-center items-center text-xl text-amber-50">
+        <div className="flex justify-center items-center text-sm sm:text-base md:text-lg lg:text-xl text-amber-50">
            <p>Users Online:</p>
         </div>
  
       <div className={`w-32 h-12 ${onlineUsers.size == 0 ? "border-0" : "border"}  border-green-500 rounded-md px-2 py-1`}>
         {onlineUsers.size === 0 ? (
-          <p className="text-red-700 py-2 text-xl">None Online</p>
+          <p className="text-red-700 py-2 text-sm sm:text-base md:text-lg lg:text-xl">None Online</p>
         ) : (
           <div ref={onlineList} className="overflow-y-auto h-full scrollbar-thin">
             {[...onlineUsers].map((user) => (
@@ -309,7 +309,7 @@ useEffect(() => {
         <div>
           <button
             onClick={handleLogOut}
-            className="bg-red-500 hover:bg-red-800 px-3 py-2 text-xl text-amber-50 rounded-xl active:bg-red-700 active:scale-95 transition duration-150"
+            className="bg-red-500 hover:bg-red-800 px-3 py-2 text-sm sm:text-base md:text-lg lg:text-xl text-amber-50 rounded-xl active:bg-red-700 active:scale-95 transition duration-150"
           >
             Leave Room
           </button>
