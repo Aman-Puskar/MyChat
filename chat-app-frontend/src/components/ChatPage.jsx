@@ -318,7 +318,7 @@ useEffect(() => {
 
       <main
         ref={chatBoxRef}
-        className='pt-24 pb-[72px] border w-full md:w-2/3 mx-auto 
+        className='pt-26 pb-[72px] border w-full md:w-2/3 mx-auto 
              bg-[url("/background_images/chat-bg-image2.jpg")] 
              bg-cover bg-center bg-no-repeat h-screen 
              overflow-y-auto px-3 md:px-2 flex flex-col'
@@ -328,10 +328,10 @@ useEffect(() => {
             key={index}
             className={`flex ${
               message.sender === currentUser ? "justify-end" : "justify-start"
-            } mt-5`}
+            } mt-2`}
           >
             <div
-              className={`'mt-3  rounded text-lime-50 ${
+              className={`'mt-2  rounded text-lime-50 ${
                 message.sender === currentUser ? "bg-purple-600" : "bg-gray-600"
               }`}
             >
