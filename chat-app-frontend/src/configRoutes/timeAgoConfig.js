@@ -1,16 +1,8 @@
 export function getTimeAgo(timestamp) {
-  const inputDate = new Date(timestamp);
-
-  // Check if input is in UTC format (contains 'Z')
-  const isUTC = typeof timestamp === "string" && timestamp.endsWith("Z");
-
-  // Adjust only if it's a backend UTC timestamp
-  const localDate = isUTC
-    ? new Date(inputDate.getTime() + (new Date().getTimezoneOffset() * -60000))
-    : inputDate;
-
+  const inputDate = new Date(timestamp); 
   const now = new Date();
-  const secondsAgo = Math.floor((now - localDate) / 1000);
+
+  const secondsAgo = Math.floor((now - inputDate) / 1000);
 
   if (secondsAgo < 60) return `just now`;
   const minutesAgo = Math.floor(secondsAgo / 60);
