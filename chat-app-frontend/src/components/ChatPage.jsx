@@ -11,6 +11,7 @@ import { getTimeAgo } from "../configRoutes/timeAgoConfig";
 import CryptoJS from "crypto-js";
 import { Client } from "@stomp/stompjs";
 import EmojiPicker from "emoji-picker-react";
+import { httpClient } from "../configRoutes/axiosHelper";
 
 const ChatPage = () => {
   //show online status
@@ -24,6 +25,10 @@ const ChatPage = () => {
   const typingTimeoutRef = useRef(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const emojiPickerRef = useRef();
+  const fileInputRef = useRef('');
+const [file, setFile] = useState(null);
+const [receivedFile, setReceivedFile] = useState(null);
+
 
   const navigate = useNavigate();
   const {
@@ -50,7 +55,7 @@ const ChatPage = () => {
   const [stompClient, setStompClient] = useState(null);
   const onlineList = useRef(null);
 
-
+  //scroll the online list
     useEffect(() => {
     if (onlineList.current) {
       onlineList.current.scrollTo({
@@ -170,6 +175,24 @@ const ChatPage = () => {
           }
         });
 
+        //handling comming files
+        client.subscribe(`/topic/sendFile/${roomId}`, (message) => {
+      const { sender, fileName,fileUrl, fileType, fileData } = JSON.parse(message.body);
+        const fileMessage = {
+                sender,
+                content: "", // no text content
+                fileUrl,
+                fileName,
+                fileType,
+                timeStamp: Date.now(),
+                isFile: true, // custom flag
+              };
+
+              setMessages((prev) => [...prev, fileMessage]);
+                    })
+
+
+
         setTimeout(() => {
           client.publish({
             destination: `/app/isOnline/${roomId}`,
@@ -197,21 +220,52 @@ const ChatPage = () => {
     };
   }, [roomId, connected]);
 
+
+
   //handling input messages
-  const sendMessage = () => {
-    if (stompClient && connected && input.trim()) {
+  const sendMessage = async () => {
+    if (stompClient && connected && input.trim().length > 0) {
       // console.log(input);
-    }
+    
     const encryptedContent = encryptMessage(input);
     const encryptedSender = encryptMessage(currentUser);
     const message = {
       content: encryptedContent,
       sender: encryptedSender,
       roomId: roomId,
-    };
+    }
     stompClient.send(`/app/sendMessage/${roomId}`, {}, JSON.stringify(message));
     setInput("");
-  };
+  } 
+
+if (file != null) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  try {
+    const response = await httpClient.post("/api/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    const fileUrl = response.data.fileUrl;
+
+    const filePayload = {
+      fileName: file.name,
+      fileType: file.type,
+      sender: currentUser,
+      fileUrl: fileUrl,
+      roomId: roomId,
+    };
+
+    stompClient.send(`/app/sendFile/${roomId}`, {}, JSON.stringify(filePayload));
+    setFile(null);
+  } catch (error) {
+    console.error("File upload failed:", error);
+  }
+}
+};
 
   //handle logout
   function handleLogOut() {
@@ -270,9 +324,27 @@ useEffect(() => {
     };
   }, []);
 
+
+
+  //handling file send
+
+const handleFileButtonClick = () => {
+   if (fileInputRef.current) {
+    fileInputRef.current.value = ""; //  clear previous selection
+    fileInputRef.current.click();    //  open file picker
+  }
+};
+
+const handleFileChange = (e) => {
+  const fileExist = e.target.files[0];
+  setFile(fileExist);
+  console.log("Selected file:", fileExist);
+};
+
+
   return (
     <div>
-      <header className="border-gray-400 fixed w-full bg-gray-900 py-7 flex justify-around rounded shadow items-center">
+      <header className=" z-20 border-gray-400 fixed w-full bg-gray-900 py-7 flex justify-around rounded shadow items-center">
        
 
         <div>
@@ -321,8 +393,9 @@ useEffect(() => {
         className='pt-26 pb-[72px] border w-full md:w-2/3 mx-auto 
              bg-[url("/background_images/chat-bg-image2.jpg")] 
              bg-cover bg-center bg-no-repeat h-screen 
-             overflow-y-auto px-3 md:px-2 flex flex-col'
+             overflow-y-auto px-3 md:px-2 flex flex-col' 
       >
+  
         {messages.map((message, index) => (
           <div
             key={index}
@@ -333,7 +406,7 @@ useEffect(() => {
             <div
               className={`'mt-2  rounded text-lime-50 ${
                 message.sender === currentUser ? "bg-purple-600" : "bg-gray-600"
-              }`}
+              }  max-w-[80vw] sm:max-w-md break-words p-2`}
             >
               <div className="flex flex-row gap-2">
                 <img
@@ -343,15 +416,54 @@ useEffect(() => {
                 />
                 <div className="flex flex-col px-1">
                   <p className="font-bold text-sm">{message.sender}</p>
-                  <p>{message.content}</p>
+        {message.isFile ? (
+  message.fileType?.startsWith("image/") ? (
+    <img
+      src={message.fileUrl}
+      alt={message.fileName}
+      className="max-w-full sm:max-w-xs rounded mt-1"
+    />
+            ) : message.fileType?.startsWith("audio/") ? (
+              <audio controls className="mt-1">
+                <source src={message.fileUrl} type={message.fileType} />
+                Your browser does not support the audio element.
+              </audio>
+            ) : message.fileType?.startsWith("video/") ? (
+              <video controls className="z-0 max-w-full sm:max-w-xs rounded mt-1">
+                <source src={message.fileUrl} type={message.fileType} />
+                Your browser does not support the video tag.
+              </video>
+            ) : (
+    <a
+      href={message.fileUrl}
+      download={message.fileName}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-blue-300 underline break-all max-w-full sm:max-w-xs rounded mt-1"
+    >
+      📎 {message.fileName}
+    </a>
+  )
+) : (
+  <p className="break-words break-all overflow-hidden">{message.content}</p>
+)}
+
                   <p className="text-xs text-white">
                     {getTimeAgo(message.timeStamp)}
                   </p>
                 </div>
               </div>
-            </div>
+              
+            </div> 
+            
+            
           </div>
         ))}
+
+
+       
+
+
         {typingUser && (
           <div className="mt-2 text-lg italic text-gray-100 animate-bounce">
             {typingUser} is typing...
@@ -359,8 +471,8 @@ useEffect(() => {
         )}
       </main>
 
-      <div className="fixed bottom-0 w-full px-2">
-        <div className="w-full md:w-2/3 mx-auto flex items-center gap-2 bg-gray-900 px-3 py-3 rounded-full h-16">
+      <div className="fixed bottom-0 w-full px-6">
+        <div className=" relative w-full md:w-2/3 flex-wrap  mx-auto flex items-center gap-2 bg-gray-900 px-3 py-3  rounded-full h-auto">
           <input
             type="text"
             value={input}
@@ -397,7 +509,7 @@ useEffect(() => {
               }
             }}
             placeholder="Your message..."
-            className="flex-1 px-3 py-2 rounded-full bg-gray-700 text-gray-200 text-sm focus:outline-none"
+            className="flex-1 px-3 py-2 min-w-0 rounded-full bg-gray-700 text-gray-200 text-sm focus:outline-none"
           />
 
           {/* Emoji Picker */}
@@ -416,22 +528,59 @@ useEffect(() => {
           )}
 
           {/* Action Buttons */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
+          
             <button
               onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-              className="bg-yellow-300 p-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-yellow-600 text-lg md:text-xl
+              className="bg-yellow-300 p-2 w-9 h-9 flex items-center justify-center rounded-full hover:bg-yellow-600 text-lg md:text-xl
                             active:bg-yellow-800 active:scale-95 transition duration-150"
             >
               😊
             </button>
 
-            {/* <button className='bg-green-400 p-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-green-700'>
-        <MdAttachFile size={20} />
-      </button> */}
+
+            <button
+             onClick={handleFileButtonClick}
+             className={`p-2 w-9 h-9  ${file != null ? "bg-green-600":"bg-fuchsia-500"} flex items-center justify-center rounded-full hover:bg-fuchsia-800 text-white active:scale-95 transition duration-150`}
+            >
+            <MdAttachFile size={22} className="rotate-45" />
+          </button>
+
+          <input
+               type="file"
+               ref={fileInputRef}   
+               onChange={handleFileChange}
+               className="hidden"
+              />
+          {file && (
+             <div
+             className="absolute bottom-17 right-0 z-50 flex flex-col gap-1 
+               justify-center items-center bg-gray-300 border border-gray-400 
+               px-3 py-2 rounded shadow max-w-[70vw] md:max-w-xs animate-bounce-once"
+            >
+            <div className="text-black text-xs max-w-[200px] break-words overflow-hidden whitespace-normal">
+                  {file.name}
+            </div>
+            <button
+              onClick={() => {setFile(null)
+                if (fileInputRef.current) {
+                     fileInputRef.current.value = ''; 
+                    }
+              }
+                
+              }
+              className="bg-red-700 h-7  text-white text-xs px-2 py-0.5 rounded hover:bg-red-800 active:scale-95 transition duration-150"
+            >
+              Cancel
+            </button>
+          </div>
+        )}
+
+
 
             <button
               onClick={sendMessage}
-              className="bg-blue-400 p-2 w-10 h-10 flex items-center justify-center rounded-full hover:bg-blue-700 active:bg-blue-900 active:scale-95 transition duration-150"
+              className="bg-blue-400 p-2 w-9 h-9 flex items-center justify-center rounded-full hover:bg-blue-700 active:bg-blue-900 active:scale-95 transition duration-150"
             >
               <MdSend size={20} />
             </button>

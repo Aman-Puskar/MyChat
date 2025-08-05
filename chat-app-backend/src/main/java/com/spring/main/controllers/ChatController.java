@@ -76,6 +76,7 @@ public class ChatController {
         return payload;
     }
 
+    // offline status
     @MessageMapping("/isOffline/{roomId}")
     @SendTo("/topic/isOffline/{roomId}")
     public Map<String, String> handleOfflineStatus(
@@ -83,4 +84,16 @@ public class ChatController {
             @Payload Map<String, String> payload) {
         return payload;
     }
+
+    @MessageMapping("/sendFile/{roomId}")
+    @SendTo("/topic/sendFile/{roomId}")
+    public Map<String, String> handleFileMessage(
+            @DestinationVariable String roomId,
+            @Payload Map<String, String> payload) {
+
+        // payload contains keys like "sender", "fileUrl", "fileName"
+
+        return payload;
+    }
+
 }
