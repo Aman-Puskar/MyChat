@@ -415,9 +415,9 @@ const handleFileChange = (e) => {
                   alt=""
                 />
                 <div className="flex flex-col px-1">
-                  <p className="font-bold text-sm">{message.sender}</p>
-              {message.isFile ? (
-              message.fileType?.startsWith("image/") ? (
+                <p className="font-bold text-sm">{message.sender}</p>
+                 {message.isFile ? (
+                  message.fileType?.startsWith("image/") ? (
                 <img
                   src={message.fileUrl}
                   alt={message.fileName}
@@ -434,22 +434,22 @@ const handleFileChange = (e) => {
                 Your browser does not support the video tag.
               </video>
             ) : (
-    <a
-      href={message.fileUrl}
-      download={message.fileName}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-blue-300 underline break-all max-w-full sm:max-w-xs rounded mt-1"
-    >
-      📎 {message.fileName}
-    </a>
-  )
-) : (
-  <p className="break-words break-all overflow-hidden">{message.content}</p>
-)}
+                 <a
+                    href={message.fileUrl}
+                    download={message.fileName}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-300 underline break-all max-w-full sm:max-w-xs rounded mt-1"
+                  >
+                    📎 {message.fileName}
+                  </a>
+                )
+              ) : (
+                <p className="break-words break-all overflow-hidden">{message.content}</p>
+              )}
 
                   <p className="text-xs text-white">
-                    {getTimeAgo(message.timeStamp)}
+                    {message.isFile ? getTimeAgo(new Date()) : getTimeAgo(message.timeStamp)}
                   </p>
                 </div>
               </div>
