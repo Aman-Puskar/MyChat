@@ -234,6 +234,7 @@ const [receivedFile, setReceivedFile] = useState(null);
       content: encryptedContent,
       sender: encryptedSender,
       roomId: roomId,
+      timeNow : getCurrentTimeAMPM(),
     }
     stompClient.send(`/app/sendMessage/${roomId}`, {}, JSON.stringify(message));
     setInput("");
@@ -450,7 +451,7 @@ const handleFileChange = (e) => {
               )}
 
                   <p className="text-xs text-white">
-  {                 getCurrentTimeAMPM()}
+                    {message.isFile ? getCurrentTimeAMPM() : timeStamp}
                   </p>
                 </div>
               </div>
