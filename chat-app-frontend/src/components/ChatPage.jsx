@@ -447,7 +447,7 @@ const handleFileChange = (e) => {
                   </a>
                 )
               ) : (
-                <p className="break-words break-all overflow-hidden">{message.content}</p>
+                <p className="break-words break-all overflow-hidden text-xs">{message.content}</p>
               )}
                   <div className="flex justify-end">
                   <p className="text-xs text-white items-end">
