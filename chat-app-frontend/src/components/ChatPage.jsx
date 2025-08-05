@@ -451,7 +451,7 @@ const handleFileChange = (e) => {
               )}
 
                   <p className="text-xs text-white">
-                    {message.isFile ? getCurrentTimeAMPM() : timeStamp}
+                    {message.isFile ? getCurrentTimeAMPM() : message.timeStamp}
                   </p>
                 </div>
               </div>
