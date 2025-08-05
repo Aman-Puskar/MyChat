@@ -180,12 +180,12 @@ const [receivedFile, setReceivedFile] = useState(null);
       const { sender, fileName,fileUrl, fileType, fileData } = JSON.parse(message.body);
         const fileMessage = {
                 sender,
-                content: "", // no text content
+                content: "", 
                 fileUrl,
                 fileName,
                 fileType,
                 timeStamp: Date.now(),
-                isFile: true, // custom flag
+                isFile: true,
               };
 
               setMessages((prev) => [...prev, fileMessage]);
@@ -416,15 +416,15 @@ const handleFileChange = (e) => {
                 />
                 <div className="flex flex-col px-1">
                   <p className="font-bold text-sm">{message.sender}</p>
-        {message.isFile ? (
-  message.fileType?.startsWith("image/") ? (
-    <img
-      src={message.fileUrl}
-      alt={message.fileName}
-      className="max-w-full sm:max-w-xs rounded mt-1"
-    />
+              {message.isFile ? (
+              message.fileType?.startsWith("image/") ? (
+                <img
+                  src={message.fileUrl}
+                  alt={message.fileName}
+                  className="max-w-full sm:max-w-xs rounded mt-1"
+                />
             ) : message.fileType?.startsWith("audio/") ? (
-              <audio controls className="mt-1">
+              <audio controls className="z-0 max-w-full sm:max-w-xs rounded mt-1">
                 <source src={message.fileUrl} type={message.fileType} />
                 Your browser does not support the audio element.
               </audio>
