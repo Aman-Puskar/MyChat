@@ -417,7 +417,7 @@ const handleFileChange = (e) => {
                   alt=""
                 />
                 <div className="flex flex-col px-1">
-                <p className="font-bold text-sm">{message.sender}</p>
+                <p className="font-bold text-xl">{message.sender}</p>
                  {message.isFile ? (
                   message.fileType?.startsWith("image/") ? (
                 <img
@@ -450,7 +450,7 @@ const handleFileChange = (e) => {
                 <p className="break-words break-all overflow-hidden text-xs">{message.content}</p>
               )}
                   <div className="flex justify-end">
-                  <p className="text-xs text-white items-end">
+                  <p className="text-xs text-white">
                     {message.isFile ? getCurrentTimeAMPM() : message.timeStamp}
                   </p>
                   </div>
