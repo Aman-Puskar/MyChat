@@ -417,7 +417,7 @@ const handleFileChange = (e) => {
                   alt=""
                 />
                 <div className="flex flex-col px-1">
-                <p className="font-bold text-xl">{message.sender}</p>
+                <p className="font-bold text-base">{message.sender}</p>
                  {message.isFile ? (
                   message.fileType?.startsWith("image/") ? (
                 <img
@@ -447,7 +447,7 @@ const handleFileChange = (e) => {
                   </a>
                 )
               ) : (
-                <p className="break-words break-all overflow-hidden text-xs">{message.content}</p>
+                <p className="break-words break-all overflow-hidden text-sm">{message.content}</p>
               )}
                   <div className="flex justify-end">
                   <p className="text-xs text-white">
