@@ -28,7 +28,7 @@ public class FileUploadController {
             Files.createDirectories(path.getParent());
             Files.write(path, file.getBytes());
 
-String fileUrl = "https://mychat-aaxu.onrender.com/files/" + fileName;
+            String fileUrl = "https://mychat-aaxu.onrender.com/uploads/" + fileName;
 
             Map<String, String> response = new HashMap<>();
             response.put("fileUrl", fileUrl);
