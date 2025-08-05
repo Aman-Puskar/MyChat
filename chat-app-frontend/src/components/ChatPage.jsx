@@ -449,7 +449,7 @@ const handleFileChange = (e) => {
               )}
 
                   <p className="text-xs text-white">
-                    {message.isFile ? getTimeAgo(new Date()) : getTimeAgo(message.timeStamp)}
+                    {message.isFile ? getTimeAgo(new Date().toISOString()) : getTimeAgo(message.timeStamp)}
                   </p>
                 </div>
               </div>
