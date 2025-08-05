@@ -12,6 +12,7 @@ import CryptoJS from "crypto-js";
 import { Client } from "@stomp/stompjs";
 import EmojiPicker from "emoji-picker-react";
 import { httpClient } from "../configRoutes/axiosHelper";
+import { getCurrentTimeAMPM } from "../configRoutes/timeAgoConfig";
 
 const ChatPage = () => {
   //show online status
@@ -449,7 +450,7 @@ const handleFileChange = (e) => {
               )}
 
                   <p className="text-xs text-white">
-                    {getTimeAgo(message.isFile ? new Date().toISOString() : message.timeStamp)}
+  {                 getCurrentTimeAMPM()}
                   </p>
                 </div>
               </div>
