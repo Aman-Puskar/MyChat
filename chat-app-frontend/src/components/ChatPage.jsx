@@ -450,7 +450,7 @@ const handleFileChange = (e) => {
                 <p className="break-words break-all overflow-hidden">{message.content}</p>
               )}
 
-                  <p className="text-xs text-white">
+                  <p className="text-xs text-white items-end">
                     {message.isFile ? getCurrentTimeAMPM() : message.timeStamp}
                   </p>
                 </div>
