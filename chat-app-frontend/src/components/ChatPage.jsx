@@ -449,10 +449,11 @@ const handleFileChange = (e) => {
               ) : (
                 <p className="break-words break-all overflow-hidden">{message.content}</p>
               )}
-
+                  <div className="flex justify-end">
                   <p className="text-xs text-white items-end">
                     {message.isFile ? getCurrentTimeAMPM() : message.timeStamp}
                   </p>
+                  </div>
                 </div>
               </div>
               
