@@ -15,11 +15,11 @@ public class Message {
 
     private String sender;
     private String content;
-    private LocalDateTime timeStamp;
+    private String timeStamp;
 
-    public Message(String sender, String content) {
-        this.sender = sender;
-        this.content = content;
-        this.timeStamp = LocalDateTime.now();
-    }
+    // public Message(String sender, String content, String timeNow) {
+    // this.sender = sender;
+    // this.content = content;
+    // this.timeStamp = timeNow;
+    // }
 }
