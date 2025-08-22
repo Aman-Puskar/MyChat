@@ -15,7 +15,8 @@ public class WebConfig {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins(
-                                "https://talk-circuit.vercel.app", "http://localhost:5173")
+                                "https://talk-circuit.vercel.app", "https://mychat-theta-seven.vercel.app",
+                                "http://localhost:5173")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*");
             }
