@@ -7,7 +7,7 @@ import SockJS from "sockjs-client";
 import { Stomp } from "@stomp/stompjs";
 import toast from "react-hot-toast";
 import { getRoomMessages } from "../services/RoomService";
-import { getTimeAgo } from "../configRoutes/timeAgoConfig";
+// import { getTimeAgo } from "../configRoutes/timeAgoConfig";
 import CryptoJS from "crypto-js";
 import { Client } from "@stomp/stompjs";
 import EmojiPicker from "emoji-picker-react";
@@ -150,9 +150,10 @@ const [receivedFile, setReceivedFile] = useState(null);
         client.subscribe(`/topic/isOnline/${roomId}`, (message) => {
           const { sender, type } = JSON.parse(message.body);
           if (sender !== currentUser) {
-            // setOnlineUser(sender);
-              setOnlineUsers((prev) => new Set([...prev, sender]));
-
+            setOnlineUsers((prev) => new Set([...prev, sender]));
+            if (type === "request") {
+              toast.success(`${sender} joined the room`);
+            }
 
             // Only reply back if this was a fresh request
             if (type === "request") {
@@ -173,6 +174,7 @@ const [receivedFile, setReceivedFile] = useState(null);
               updated.delete(sender);
               return updated;
             });
+            toast.error(`${sender} left the room`);
           }
         });
 
@@ -343,7 +345,6 @@ const handleFileChange = (e) => {
   console.log("Selected file:", fileExist);
 };
 
-
   return (
     <div>
       <header className=" z-20 border-gray-400 fixed w-full bg-gray-900 py-7 flex justify-around rounded shadow items-center">
@@ -356,8 +357,11 @@ const handleFileChange = (e) => {
         </div>
 
        <div className="flex gap-1.5"> 
-        <div className="flex justify-center items-center text-sm sm:text-base md:text-lg lg:text-xl text-amber-50">
+        <div className="flex flex-col justify-center items-center text-sm sm:text-base md:text-lg lg:text-xl text-amber-50">
            <p>Users Online:</p>
+           <div className="text-green-400 text-sm sm:text-base md:text-lg lg:text-xl">
+             +{onlineUsers.size}
+           </div>
         </div>
  
       <div className={`w-32 h-12 ${onlineUsers.size == 0 ? "border-0" : "border"}  border-green-500 rounded-md px-2 py-1`}>
