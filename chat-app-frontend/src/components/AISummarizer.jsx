@@ -92,7 +92,7 @@ const AISummarizer = ({ isOpen, onClose, chatText }) => {
   const loadInitialSummary = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:5175/api/summarize-chat", {
+      const response = await fetch("https://mychat-2-vb16.onrender.com/api/summarize-chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
