@@ -13,6 +13,7 @@ import { Client } from "@stomp/stompjs";
 import EmojiPicker from "emoji-picker-react";
 import { httpClient } from "../configRoutes/axiosHelper";
 import { getCurrentTimeAMPM } from "../configRoutes/timeAgoConfig";
+import AISummarizer from "./AISummarizer";
 
 const ChatPage = () => {
   //show online status
@@ -29,6 +30,9 @@ const ChatPage = () => {
   const fileInputRef = useRef('');
 const [file, setFile] = useState(null);
 const [receivedFile, setReceivedFile] = useState(null);
+const [showAiHint, setShowAiHint] = useState(false);
+const [showCopyOption, setShowCopyOption] = useState(false);
+const [showAISummarizer, setShowAISummarizer] = useState(false);
 
 
   const navigate = useNavigate();
@@ -65,6 +69,21 @@ const [receivedFile, setReceivedFile] = useState(null);
       });
     }
   }, [onlineUsers]);
+
+  useEffect(() => {
+    const showHintTimer = window.setTimeout(() => {
+      setShowAiHint(true);
+    }, 10000);
+
+    const hideHintTimer = window.setTimeout(() => {
+      setShowAiHint(false);
+    }, 18000);
+
+    return () => {
+      window.clearTimeout(showHintTimer);
+      window.clearTimeout(hideHintTimer);
+    };
+  }, []);
 
   //scrol the main message container
   useEffect(() => {
@@ -274,6 +293,8 @@ if (file != null) {
   //handle logout
   function handleLogOut() {
     isLoggingOut.current = true;
+    // Close AI Summarizer and clear messages
+    setShowAISummarizer(false);
     // Notify others you're offline
     stompClient.send(
       `/app/isOffline/${roomId}`,
@@ -345,6 +366,45 @@ const handleFileChange = (e) => {
   console.log("Selected file:", fileExist);
 };
 
+const getChatTextForCopy = () => {
+  return messages
+    .map((message) => {
+      const time = message.isFile ? getCurrentTimeAMPM() : message.timeStamp;
+      if (message.isFile) {
+        return `[${message.sender}] (${time}): [file] ${message.fileName} ${message.fileUrl}`;
+      }
+      return `[${message.sender}] (${time}): ${message.content}`;
+    })
+    .join("\n");
+};
+
+const openAIPage = () => {
+  setShowCopyOption(true);
+  setShowAiHint(false);
+};
+
+const handleCopyAndOpenAI = async () => {
+  const chatText = getChatTextForCopy();
+  try {
+    await navigator.clipboard.writeText(chatText);
+    toast.success("Chat copied successfully!");
+  } catch (error) {
+    console.error("Clipboard copy failed", error);
+    toast.error("Unable to copy chat");
+  }
+  setShowCopyOption(false);
+  setShowAISummarizer(true);
+};
+
+const handleOpenAIWithoutCopy = () => {
+  setShowCopyOption(false);
+  setShowAISummarizer(true);
+};
+
+const handleCutOption = () => {
+  setShowCopyOption(false);
+};
+
   return (
     <div>
       <header className=" z-20 border-gray-400 fixed w-full bg-gray-900 py-7 flex justify-around rounded shadow items-center">
@@ -384,7 +444,51 @@ const handleFileChange = (e) => {
 </div>
 </div>
  
-        <div>
+        <div className="relative flex items-center gap-2">
+          <button
+            type="button"
+            title="AI help"
+            onClick={openAIPage}
+            className="flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 px-3 py-2 text-sm sm:text-base md:text-lg lg:text-xl text-white rounded-xl border border-white/20 shadow-sm transition duration-150 active:scale-95"
+          >
+            <span className="text-lg">🤖</span>
+            <span className="font-semibold">AI</span>
+          </button>
+          {showAiHint && (
+            <div className="absolute top-full right-0 mt-3 w-60 rounded-3xl border border-white/20 bg-white/10 px-4 py-3 text-left text-sm text-white shadow-2xl backdrop-blur-xl transition duration-500">
+              <p className="font-semibold text-cyan-200">Ask AI to help summarize</p>
+              <p className="text-slate-200 text-xs mt-1">Tap the AI button above to open help.</p>
+            </div>
+          )}
+          {showCopyOption && (
+            <div className="absolute top-full right-0 mt-3 w-72 rounded-3xl border border-white/20 bg-slate-900/90 px-4 py-3 text-left text-sm text-white shadow-2xl backdrop-blur-xl transition duration-500 z-20">
+              <p className="font-semibold text-cyan-200">Copy the whole chat text?</p>
+              <p className="text-slate-300 text-xs mt-1">If you want to paste the full chat, choose Copy. Otherwise continue to AI.</p>
+              <div className="mt-3 flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleCopyAndOpenAI}
+                  className="flex-1 rounded-xl bg-cyan-500 px-3 py-2 text-sm font-semibold text-white hover:bg-cyan-400 transition duration-150"
+                >
+                  Copy
+                </button>
+                <button
+                  type="button"
+                  onClick={handleOpenAIWithoutCopy}
+                  className="flex-1 rounded-xl bg-white/10 border border-white/20 px-3 py-2 text-sm text-white hover:bg-white/20 transition duration-150"
+                >
+                  Skip
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCutOption}
+                  className="flex-1 rounded-xl bg-red-500 px-3 py-2 text-sm font-semibold text-white hover:bg-red-400 transition duration-150"
+                >
+                  Cut
+                </button>
+              </div>
+            </div>
+          )}
           <button
             onClick={handleLogOut}
             className="bg-red-500 hover:bg-red-800 px-3 py-2 text-sm sm:text-base md:text-lg lg:text-xl text-amber-50 rounded-xl active:bg-red-700 active:scale-95 transition duration-150"
@@ -594,6 +698,12 @@ const handleFileChange = (e) => {
           </div>
         </div>
       </div>
+
+      <AISummarizer 
+        isOpen={showAISummarizer}
+        onClose={() => setShowAISummarizer(false)}
+        chatText={getChatTextForCopy()}
+      />
     </div>
   );
 };
