@@ -136,7 +136,7 @@ const AISummarizer = ({ isOpen, onClose, chatText }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5175/api/chat-with-ai", {
+      const response = await fetch("https://mychat-2-vb16.onrender.com/api/chat-with-ai", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
