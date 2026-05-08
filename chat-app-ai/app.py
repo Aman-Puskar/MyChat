@@ -36,6 +36,7 @@ def summarize_chat():
         # Create a prompt for summarization
         prompt = f"""Please provide a brief and concise summary of the following chat conversation. 
 Keep the summary short (2-3 sentences) and highlight the main points.
+Always give the summary in bullet points if there are multiple key points, and keep the tone neutral.
 
 Chat Conversation:
 {chat_text}
