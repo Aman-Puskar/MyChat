@@ -33,7 +33,7 @@ const Layouts = ({ children }) => {
             className="absolute inset-0 w-full h-full object-cover z-[-1]"
             
           >
-            <source src="/background_videos/room-bg2.mp4" type="video/mp4" />
+            <source src="/background_videos/room-bg4.mp4" type="video/mp4" />
           </video>
         </>
       )}
@@ -51,7 +51,7 @@ const Layouts = ({ children }) => {
             className="absolute inset-0 w-full h-full object-cover z-[-1]"
           
           >
-            <source src="/background_videos/chat-bg3.mp4" type="video/mp4" />
+            <source src="/background_videos/chat-bg4.mp4" type="video/mp4" />
           </video>
         </>
       )}

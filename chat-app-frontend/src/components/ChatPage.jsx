@@ -14,6 +14,7 @@ import EmojiPicker from "emoji-picker-react";
 import { httpClient } from "../configRoutes/axiosHelper";
 import { getCurrentTimeAMPM } from "../configRoutes/timeAgoConfig";
 import AISummarizer from "./AISummarizer";
+import "./ChatPage.css";
 
 const ChatPage = () => {
   //show online status
@@ -33,6 +34,10 @@ const [receivedFile, setReceivedFile] = useState(null);
 const [showAiHint, setShowAiHint] = useState(false);
 const [showCopyOption, setShowCopyOption] = useState(false);
 const [showAISummarizer, setShowAISummarizer] = useState(false);
+const [showMentions, setShowMentions] = useState(false);
+const [mentionSuggestions, setMentionSuggestions] = useState([]);
+const [mentionQuery, setMentionQuery] = useState('');
+const mentionsRef = useRef(null);
 
 
   const navigate = useNavigate();
@@ -332,7 +337,7 @@ useEffect(() => {
 }, [stompClient, currentUser, roomId]);
 
 
-  //emoji picker
+  //emoji picker and mentions
   useEffect(() => {
     function handleClickOutside(event) {
       if (
@@ -340,6 +345,12 @@ useEffect(() => {
         !emojiPickerRef.current.contains(event.target)
       ) {
         setShowEmojiPicker(false);
+      }
+      if (
+        mentionsRef.current &&
+        !mentionsRef.current.contains(event.target)
+      ) {
+        setShowMentions(false);
       }
     }
 
@@ -407,35 +418,35 @@ const handleCutOption = () => {
 
   return (
     <div>
-      <header className=" z-20 border-gray-400 fixed w-full bg-gray-900 py-7 flex justify-around rounded shadow items-center">
+      <header className="z-20 fixed w-full bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-b border-gray-700 py-5 flex justify-around items-center shadow-md">
        
 
         <div>
-          <h1 className="text-amber-50 text-sm sm:text-base md:text-lg lg:text-xl">
-            User : <span>{currentUser}</span>
+          <h1 className="text-white font-semibold text-sm sm:text-base md:text-lg">
+            <span className="text-gray-400">Chat as</span> {currentUser}
           </h1>
         </div>
 
-       <div className="flex gap-1.5"> 
-        <div className="flex flex-col justify-center items-center text-sm sm:text-base md:text-lg lg:text-xl text-amber-50">
-           <p>Users Online:</p>
-           <div className="text-green-400 text-sm sm:text-base md:text-lg lg:text-xl">
+       <div className="flex gap-2"> 
+        <div className="flex flex-col justify-center items-center text-sm sm:text-base text-gray-300">
+           <p className="text-xs text-gray-500">Online</p>
+           <div className="text-green-400 font-semibold text-base">
              +{onlineUsers.size}
            </div>
         </div>
  
-      <div className={`w-32 h-12 ${onlineUsers.size == 0 ? "border-0" : "border"}  border-green-500 rounded-md px-2 py-1`}>
+      <div className={`w-28 h-10 flex items-center justify-center ${onlineUsers.size == 0 ? "border-0" : "border border-green-500/40"} rounded-lg px-2 py-1 bg-gray-800/50`}>
         {onlineUsers.size === 0 ? (
-          <p className="text-red-700 py-2 text-sm sm:text-base md:text-lg lg:text-xl">None Online</p>
+          <p className="text-red-500 text-xs sm:text-sm font-semibold -m-4">None Online</p>
         ) : (
           <div ref={onlineList} className="overflow-y-auto h-full scrollbar-thin">
             {[...onlineUsers].map((user) => (
            <div
              key={user}
-            className="flex items-center gap-1 text-sm text-green-400 truncate"
+            className="flex items-center gap-1 text-xs text-green-400"
           >
-          <div className="w-2 h-2 rounded-full bg-green-400" />
-              {user}
+          <div className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0" />
+              <span className="truncate">{user}</span>
          </div>
         ))}
       </div>
@@ -444,45 +455,44 @@ const handleCutOption = () => {
 </div>
 </div>
  
-        <div className="relative flex items-center gap-2">
+        <div className="relative flex items-center gap-3">
           <button
             type="button"
             title="AI help"
             onClick={openAIPage}
-            className="flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 px-3 py-2 text-sm sm:text-base md:text-lg lg:text-xl text-white rounded-xl border border-white/20 shadow-sm transition duration-150 active:scale-95"
+            className="ai-button-animated flex items-center justify-center p-2 rounded-full transition duration-150 active:scale-95"
           >
-            <span className="text-lg">🤖</span>
-            <span className="font-semibold">AI</span>
+            <span className="text-lg">✨</span>
           </button>
           {showAiHint && (
-            <div className="absolute top-full right-0 mt-3 w-60 rounded-3xl border border-white/20 bg-white/10 px-4 py-3 text-left text-sm text-white shadow-2xl backdrop-blur-xl transition duration-500">
-              <p className="font-semibold text-cyan-200">Ask AI to help summarize</p>
-              <p className="text-slate-200 text-xs mt-1">Tap the AI button above to open help.</p>
+            <div className="absolute top-full right-0 mt-3 w-56 rounded-xl border border-blue-400/50 bg-gradient-to-br from-blue-900/95 via-sky-900/95 to-cyan-900/95 px-3 py-2 text-left text-xs text-white shadow-xl shadow-blue-500/40 backdrop-blur-xl transition duration-500">
+              <p className="font-semibold text-blue-200">✨ Ask AI to summarize</p>
+              <p className="text-blue-300/80 text-xs mt-1">Tap to get AI help with your chat analysis.</p>
             </div>
           )}
           {showCopyOption && (
-            <div className="absolute top-full right-0 mt-3 w-72 rounded-3xl border border-white/20 bg-slate-900/90 px-4 py-3 text-left text-sm text-white shadow-2xl backdrop-blur-xl transition duration-500 z-20">
-              <p className="font-semibold text-cyan-200">Copy the whole chat text?</p>
-              <p className="text-slate-300 text-xs mt-1">If you want to paste the full chat, choose Copy. Otherwise continue to AI.</p>
-              <div className="mt-3 flex gap-2">
+            <div className="absolute top-full right-0 mt-2 w-60 rounded-lg border border-gray-600 bg-gray-800 px-3 py-2 text-left text-xs text-white shadow-lg backdrop-blur-xl transition duration-500 z-20">
+              <p className="font-semibold text-cyan-300">Copy chat text?</p>
+              <p className="text-gray-400 text-xs mt-1">Choose an option below.</p>
+              <div className="mt-2 flex gap-2">
                 <button
                   type="button"
                   onClick={handleCopyAndOpenAI}
-                  className="flex-1 rounded-xl bg-cyan-500 px-3 py-2 text-sm font-semibold text-white hover:bg-cyan-400 transition duration-150"
+                  className="flex-1 rounded-md bg-blue-600 px-2 py-1 text-xs font-semibold text-white hover:bg-blue-500 transition duration-150"
                 >
                   Copy
                 </button>
                 <button
                   type="button"
                   onClick={handleOpenAIWithoutCopy}
-                  className="flex-1 rounded-xl bg-white/10 border border-white/20 px-3 py-2 text-sm text-white hover:bg-white/20 transition duration-150"
+                  className="flex-1 rounded-md bg-gray-700 border border-gray-600 px-2 py-1 text-xs text-white hover:bg-gray-600 transition duration-150"
                 >
                   Skip
                 </button>
                 <button
                   type="button"
                   onClick={handleCutOption}
-                  className="flex-1 rounded-xl bg-red-500 px-3 py-2 text-sm font-semibold text-white hover:bg-red-400 transition duration-150"
+                  className="flex-1 rounded-md bg-red-600 px-2 py-1 text-xs font-semibold text-white hover:bg-red-500 transition duration-150"
                 >
                   Cut
                 </button>
@@ -491,9 +501,9 @@ const handleCutOption = () => {
           )}
           <button
             onClick={handleLogOut}
-            className="bg-red-500 hover:bg-red-800 px-3 py-2 text-sm sm:text-base md:text-lg lg:text-xl text-amber-50 rounded-xl active:bg-red-700 active:scale-95 transition duration-150"
+            className="bg-red-600 hover:bg-red-700 px-3 py-2 text-xs sm:text-sm text-white rounded-lg shadow-md active:scale-95 transition duration-150 font-semibold"
           >
-            Leave Room
+            Leave
           </button>
         </div>
       </header>
@@ -511,63 +521,71 @@ const handleCutOption = () => {
             key={index}
             className={`flex ${
               message.sender === currentUser ? "justify-end" : "justify-start"
-            } mt-2`}
+            } mt-2 mb-1 px-2`}
           >
             <div
-              className={`'mt-2  rounded text-lime-50 ${
-                message.sender === currentUser ? "bg-purple-600" : "bg-gray-600"
-              }  max-w-[80vw] sm:max-w-md break-words p-2`}
+              className={`flex gap-2 max-w-xs sm:max-w-md ${
+                message.sender === currentUser ? "flex-row-reverse" : "flex-row"
+              }`}
             >
-              <div className="flex flex-row gap-2">
-                <img
-                  className="h-10 w-10 p-1"
-                  src={`https://robohash.org/${message.sender}?set=set2`}
-                  alt=""
-                />
-                <div className="flex flex-col px-1">
-                <p className="font-bold text-base">{message.sender}</p>
-                 {message.isFile ? (
-                  message.fileType?.startsWith("image/") ? (
-                <img
-                  src={message.fileUrl}
-                  alt={message.fileName}
-                  className="max-w-full sm:max-w-xs rounded mt-1"
-                />
-            ) : message.fileType?.startsWith("audio/") ? (
-              <audio controls className="z-0 max-w-full sm:max-w-xs rounded mt-1">
-                <source src={message.fileUrl} type={message.fileType} />
-                Your browser does not support the audio element.
-              </audio>
-            ) : message.fileType?.startsWith("video/") ? (
-              <video controls className="z-0 max-w-full sm:max-w-xs rounded mt-1">
-                <source src={message.fileUrl} type={message.fileType} />
-                Your browser does not support the video tag.
-              </video>
-            ) : (
-                 <a
-                    href={message.fileUrl}
-                    download={message.fileName}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-300 underline break-all max-w-full sm:max-w-xs rounded mt-1"
-                  >
-                    📎 {message.fileName}
-                  </a>
-                )
-              ) : (
-                <p className="break-words break-all overflow-hidden text-sm">{message.content}</p>
-              )}
-                  <div className="flex justify-end">
-                  <p className="text-xs text-white">
-                    {message.isFile ? getCurrentTimeAMPM() : message.timeStamp}
+              <img
+                className="h-8 w-8 rounded-full flex-shrink-0 mt-0.5"
+                src={`https://robohash.org/${message.sender}?set=set2`}
+                alt={message.sender}
+              />
+              <div className={`flex flex-col ${message.sender === currentUser ? "items-end" : "items-start"}`}>
+                {message.sender !== currentUser && (
+                  <p className="text-xs text-gray-400 mb-0.5 font-semibold">
+                    {message.sender}
                   </p>
-                  </div>
+                )}
+                <div
+                  className={`rounded-2xl px-3 py-2 ${
+                    message.sender === currentUser 
+                      ? "bg-blue-600 text-white rounded-br-none" 
+                      : "bg-gray-700 text-gray-100 rounded-bl-none"
+                  }`}
+                >
+                  {message.isFile ? (
+                    message.fileType?.startsWith("image/") ? (
+                      <img
+                        controls
+                        src={message.fileUrl}
+                        alt={message.fileName}
+                        className="max-w-full sm:max-w-xs rounded mt-1"
+                      />
+                    ) : message.fileType?.startsWith("audio/") ? (
+                      <audio controls className="z-0 max-w-full sm:max-w-xs rounded mt-1">
+                        <source src={message.fileUrl} type={message.fileType} />
+                        Your browser does not support the audio element.
+                      </audio>
+                    ) : message.fileType?.startsWith("video/") ? (
+                      <video controls className="z-0 max-w-full sm:max-w-xs rounded mt-1">
+                        <source src={message.fileUrl} type={message.fileType} />
+                        Your browser does not support the video tag.
+                      </video>
+                    ) : (
+                      <a
+                        href={message.fileUrl}
+                        download={message.fileName}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-300 underline break-all max-w-full sm:max-w-xs text-sm"
+                      >
+                        📎 {message.fileName}
+                      </a>
+                    )
+                  ) : (
+                    <p className="text-sm break-words">{message.content}</p>
+                  )}
                 </div>
+                <p className={`text-xs mt-0.5 ${
+                  message.sender === currentUser ? "text-blue-300" : "text-gray-500"
+                }`}>
+                  {message.isFile ? getCurrentTimeAMPM() : message.timeStamp}
+                </p>
               </div>
-              
-            </div> 
-            
-            
+            </div>
           </div>
         ))}
 
@@ -588,7 +606,27 @@ const handleCutOption = () => {
             type="text"
             value={input}
             onChange={(e) => {
-              setInput(e.target.value);
+              const value = e.target.value;
+              setInput(value);
+
+              // Handle mentions with @
+              const lastAtIndex = value.lastIndexOf('@');
+              if (lastAtIndex !== -1) {
+                const textAfterAt = value.substring(lastAtIndex + 1);
+                // Check if @ is followed by space or special char (means mention has ended)
+                if (textAfterAt.includes(' ') || textAfterAt.includes('\n')) {
+                  setShowMentions(false);
+                } else {
+                  setMentionQuery(textAfterAt.toLowerCase());
+                  const filtered = [...onlineUsers].filter((user) =>
+                    user.toLowerCase().includes(textAfterAt.toLowerCase())
+                  );
+                  setMentionSuggestions(filtered);
+                  setShowMentions(filtered.length > 0 && textAfterAt.length > 0);
+                }
+              } else {
+                setShowMentions(false);
+              }
 
               if (!stompClient) return;
 
@@ -616,10 +654,11 @@ const handleCutOption = () => {
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
+                setShowMentions(false);
                 sendMessage();
               }
             }}
-            placeholder="Your message..."
+            placeholder="Type @ to mention... Your message..."
             className="flex-1 px-3 py-2 min-w-0 rounded-full bg-gray-700 text-gray-200 text-sm focus:outline-none"
           />
 
@@ -635,6 +674,32 @@ const handleCutOption = () => {
                 }
                 theme="dark"
               />
+            </div>
+          )}
+
+          {/* Mentions Dropdown */}
+          {showMentions && mentionSuggestions.length > 0 && (
+            <div
+              ref={mentionsRef}
+              className="absolute bottom-16 left-0 w-48 bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-50 max-h-40 overflow-y-auto"
+            >
+              {mentionSuggestions.map((user) => (
+                <button
+                  key={user}
+                  onClick={() => {
+                    const lastAtIndex = input.lastIndexOf('@');
+                    const beforeAt = input.substring(0, lastAtIndex);
+                    const newInput = beforeAt + '@' + user + ' ';
+                    setInput(newInput);
+                    setShowMentions(false);
+                    setMentionSuggestions([]);
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 flex items-center gap-2 border-b border-gray-700 last:border-b-0 transition duration-100"
+                >
+                  <div className="w-2 h-2 rounded-full bg-green-400 flex-shrink-0" />
+                  <span>{user}</span>
+                </button>
+              ))}
             </div>
           )}
 
