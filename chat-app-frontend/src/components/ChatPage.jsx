@@ -252,9 +252,14 @@ const mentionsRef = useRef(null);
   //handling input messages
   const sendMessage = async () => {
     if (stompClient && connected && input.trim().length > 0) {
-      // console.log(input);
+      // Process mentions - convert @username to **@username** for bold display
+      let processedMessage = input;
+      [...onlineUsers].forEach((user) => {
+        const mentionPattern = new RegExp(`@${user}\\b`, 'gi');
+        processedMessage = processedMessage.replace(mentionPattern, `**@${user}**`);
+      });
     
-    const encryptedContent = encryptMessage(input);
+    const encryptedContent = encryptMessage(processedMessage);
     const encryptedSender = encryptMessage(currentUser);
     const message = {
       content: encryptedContent,
@@ -414,6 +419,21 @@ const handleOpenAIWithoutCopy = () => {
 
 const handleCutOption = () => {
   setShowCopyOption(false);
+};
+
+// Helper function to render text with bold mentions
+const renderMessageWithMentions = (text) => {
+  const parts = text.split(/(\*\*@[^\*]+\*\*)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('**@') && part.endsWith('**')) {
+      return (
+        <span key={index} className="font-bold text-yellow-300">
+          {part.slice(2, -2)}
+        </span>
+      );
+    }
+    return <span key={index}>{part}</span>;
+  });
 };
 
   return (
@@ -576,7 +596,7 @@ const handleCutOption = () => {
                       </a>
                     )
                   ) : (
-                    <p className="text-sm break-words">{message.content}</p>
+                    <p className="text-sm break-words">{renderMessageWithMentions(message.content)}</p>
                   )}
                 </div>
                 <p className={`text-xs mt-0.5 ${
@@ -613,16 +633,19 @@ const handleCutOption = () => {
               const lastAtIndex = value.lastIndexOf('@');
               if (lastAtIndex !== -1) {
                 const textAfterAt = value.substring(lastAtIndex + 1);
-                // Check if @ is followed by space or special char (means mention has ended)
-                if (textAfterAt.includes(' ') || textAfterAt.includes('\n')) {
+                // Check if @ is followed by space (means mention has ended)
+                if (textAfterAt.includes(' ')) {
                   setShowMentions(false);
                 } else {
-                  setMentionQuery(textAfterAt.toLowerCase());
-                  const filtered = [...onlineUsers].filter((user) =>
-                    user.toLowerCase().includes(textAfterAt.toLowerCase())
-                  );
+                  // Show all users (except current user) when @ is typed, filter as user types
+                  let filtered = [...onlineUsers].filter(user => user !== currentUser);
+                  if (textAfterAt.length > 0) {
+                    filtered = filtered.filter((user) =>
+                      user.toLowerCase().includes(textAfterAt.toLowerCase())
+                    );
+                  }
                   setMentionSuggestions(filtered);
-                  setShowMentions(filtered.length > 0 && textAfterAt.length > 0);
+                  setShowMentions(filtered.length > 0);
                 }
               } else {
                 setShowMentions(false);
