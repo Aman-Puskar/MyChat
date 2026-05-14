@@ -531,8 +531,8 @@ const renderMessageWithMentions = (text) => {
       <main
         ref={chatBoxRef}
         className='pt-26 pb-[72px] border w-full md:w-2/3 mx-auto 
-             bg-[url("/background_images/chat-bg-image2.jpg")] 
-             bg-cover bg-center bg-no-repeat h-screen 
+             bg-gradient-to-br from-blue-950 via-slate-900 to-blue-900
+             h-screen 
              overflow-y-auto px-3 md:px-2 flex flex-col' 
       >
   

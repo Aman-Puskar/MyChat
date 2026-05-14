@@ -9,14 +9,10 @@ const Layouts = ({ children }) => {
   const isChatPage = location.pathname === '/chat';
 
   const roomVideoRef = useRef(null);
-  const chatVideoRef = useRef(null);
 
   useEffect(() => {
     if (isRoomPage && roomVideoRef.current) {
       roomVideoRef.current.playbackRate = 0.9;
-    }
-    if (isChatPage && chatVideoRef.current) {
-      chatVideoRef.current.playbackRate = 0.8;
     }
   }, [location]);
   return (
@@ -41,19 +37,7 @@ const Layouts = ({ children }) => {
 
 
         {isChatPage && (
-        <>
-          <video
-           ref={chatVideoRef}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover z-[-1]"
-          
-          >
-            <source src="/background_videos/chat-bg4.mp4" type="video/mp4" />
-          </video>
-        </>
+        <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-blue-950 via-slate-900 to-blue-900 z-[-1]" />
       )}
 
 
